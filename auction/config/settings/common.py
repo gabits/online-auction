@@ -26,7 +26,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'auction.urls'
+ROOT_URLCONF = 'config.site.urls'
 
 TEMPLATES = [
     {
@@ -51,15 +51,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #
 #   https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 #
-# Set MySQL as the default database service, pointing to an external host
+# Point to database committed to this codebase
+# TODO: change in the future to an external database host
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
-        'HOST': os.getenv("DB_HOST"),
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
     }
 }
 
