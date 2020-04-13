@@ -1,6 +1,13 @@
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Third-party
+import environ
+
+env = environ.Env()
+# Read .env file
+environ.Env.read_env()
+
+BASE_DIR = environ.Path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 #
 #   Application definitions
@@ -26,7 +33,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'auction.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {

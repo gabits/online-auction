@@ -1,5 +1,4 @@
-import os
-
+# Local
 from .common import *
 
 # Determine current environment

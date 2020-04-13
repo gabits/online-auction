@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
+# Python standard
 import os
 import sys
 
+# Third-party
+import dotenv
 
 def main():
+    # Read environment variables from .env file
+    dotenv.read_dotenv()
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
     try:
         from django.core.management import execute_from_command_line
