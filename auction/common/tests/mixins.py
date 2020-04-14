@@ -8,31 +8,60 @@ from django.urls import reverse
 
 # Third-party
 from rest_framework import status
-from rest_framework.exceptions import ErrorDetail
+
+# Local
+from common.tests.factories import UserFactory
 
 
 class APITestMethodsGenerator:
     """
     API test cases method generator.
+
+    Generates useful test methods for API endpoints which follow a
+    pre-defined structure (see APIEndpointTestMixin).
+
+    To benefit from it, call the class method `generate_test_methods` providing
+    it the class you want to extend test methods coverage for, as per the
+    example below.
+
+    Usage:
+
+        >>> class MyTestCase(TestCase):
+        >>>     ...
+        >>>
+        >>> APITestMethodsGenerator.generate_test_methods(MyTestCase)
+
     """
     # Supported HTTP methods by Django Rest Framework endpoints
     HTTP_METHODS = {"get", "patch", "post", "put", "delete", "head", "options"}
 
+    @staticmethod
+    def add_test_scenario(klass, test_scenario):
+        setattr(klass, test_scenario.__name__, test_scenario)
+
     @classmethod
-    def generate_methods(cls, klass):
+    def generate_test_methods(cls, klass):
         """
         Generate multiple test methods for a given class to increase test
         coverage of endpoints.
         """
         cls.generate_methods_for_unauthenticated_user_request(klass)
+        cls.generate_methods_for_http_methods_not_allowed(klass)
 
     @classmethod
     def generate_methods_for_unauthenticated_user_request(cls, klass):
         for http_method in cls.HTTP_METHODS:
-            test_scenario = cls.unauthenticated_method_test_factory(
-                http_method
-            )
-            setattr(klass, test_scenario.__name__, test_scenario)
+            test_scenario = cls.unauthenticated_method_test_factory(http_method)
+            cls.add_test_scenario(klass, test_scenario)
+
+    @classmethod
+    def generate_methods_for_http_methods_not_allowed(cls, klass):
+        methods_not_allowed = cls.HTTP_METHODS.difference(
+            klass.supported_http_methods
+        )
+        for http_method in methods_not_allowed:
+            test_scenario = cls.not_allowed_method_test_factory(http_method)
+            cls.add_test_scenario(klass, test_scenario)
 
     @staticmethod
     def unauthenticated_method_test_factory(http_method: str) -> Callable:
@@ -41,6 +70,7 @@ class APITestMethodsGenerator:
         HTTP request method, named accordingly.
         """
         def _unauthenticated_method_test(self):
+            self.authenticate()
             response = self.make_request(http_method)
             self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
             self.assertEqual(
@@ -50,7 +80,30 @@ class APITestMethodsGenerator:
 
         test_method = _unauthenticated_method_test
         test_method.__name__ = (
-            f'test_unauthenticated_{http_method}_request_returns_403'
+            f'test_unauthenticated_{http_method}_request_returns_403_forbidden'
+        )
+        return test_method
+
+    @staticmethod
+    def not_allowed_method_test_factory(http_method: str) -> Callable:
+        """
+        Generates a function to test an unauthenticated request for a given
+        HTTP request method, named accordingly.
+        """
+        def _not_allowed_method_test(self):
+            response = self.make_request(http_method)
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+            self.assertEqual(
+                bytes.decode(response.rendered_content, "utf-8"),
+                "{'detail': f'Method \"{method.upper()}\" not allowed.'}"
+            )
+
+        test_method = _not_allowed_method_test
+        test_method.__name__ = (
+            f'test_{http_method}_request_returns_405_not_allowed'
         )
         return test_method
 
@@ -63,9 +116,9 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
 
     Usage:
 
-        class MyTest(APIEndpointTestMixin, TestCase):
-            url = 'app_name:endpoint_url'
-            methods = {"get", "post"}
+        >>> class MyTest(APIEndpointTestMixin, TestCase):
+        >>>     url = 'app_name:endpoint_url'
+        >>>     methods = {"get", "post"}
 
     """
     # Extend amount of debug information, provided by `unittest.TestCase`
@@ -95,21 +148,8 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
         client_method = getattr(self.client, method)
         return client_method(url, *args, **kwargs)
 
-    # def test_methods_not_allowed_return_405(self):
-    #     self.client.force_login(self.user)
-    #     methods_not_allowed = self.HTTP_METHODS.difference(self.allowed_methods)
-    #     for method in methods_not_allowed:
-    #         url = self._get_url()
-    #         client_method = getattr(self.client, method)
-    #         response = client_method(url)
-    #         self.assertEqual(
-    #             response.status_code,
-    #             status.HTTP_405_METHOD_NOT_ALLOWED
-    #         )
-    #         self.assertEqual(
-    #             response.json(),
-    #             {'detail': f'Method \"{method.upper()}\" not allowed.'}
-    #         )
+    def setUp(self):
+        self.user = UserFactory()
 
-
-APITestMethodsGenerator.generate_methods(APIEndpointTestMixin)
+    def authenticate(self):
+        self.client.force_login(self.user)
