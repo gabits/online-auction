@@ -57,7 +57,7 @@ class APITestMethodsGenerator:
     @classmethod
     def generate_methods_for_http_methods_not_allowed(cls, klass):
         methods_not_allowed = cls.HTTP_METHODS.difference(
-            klass.supported_http_methods
+            klass.get_supported_http_methods()
         )
         for http_method in methods_not_allowed:
             test_scenario = cls.not_allowed_method_test_factory(http_method)
@@ -70,7 +70,6 @@ class APITestMethodsGenerator:
         HTTP request method, named accordingly.
         """
         def _unauthenticated_method_test(self):
-            self.authenticate()
             response = self.make_request(http_method)
             self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
             self.assertEqual(
@@ -91,6 +90,7 @@ class APITestMethodsGenerator:
         HTTP request method, named accordingly.
         """
         def _not_allowed_method_test(self):
+            self.authenticate()
             response = self.make_request(http_method)
             self.assertEqual(
                 response.status_code,
@@ -98,7 +98,8 @@ class APITestMethodsGenerator:
             )
             self.assertEqual(
                 bytes.decode(response.rendered_content, "utf-8"),
-                "{'detail': f'Method \"{method.upper()}\" not allowed.'}"
+                f'{{"detail":"Method \\\"{http_method.upper()}\\\" '
+                f'not allowed.\"}}'
             )
 
         test_method = _not_allowed_method_test
@@ -118,22 +119,22 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
 
         >>> class MyTest(APIEndpointTestMixin, TestCase):
         >>>     url = 'app_name:endpoint_url'
-        >>>     methods = {"get", "post"}
+        >>>     endpoint_methods = {"get", "post"}
 
     """
     # Extend amount of debug information, provided by `unittest.TestCase`
     longMessage = True
     # HTTP methods supported by the endpoint
-    supported_http_methods: set
+    endpoint_methods: set
     # Name spaced internal URL name to be tested by extending class
     url: str
     # Args and kwargs to provide the URL so it can successfully reverse it
     url_args: list = []
     url_kwargs: dict = {}
 
-    @property
-    def allowed_methods(self) -> set:
-        return self.supported_http_methods.union({"head", "options"})
+    @classmethod
+    def get_supported_http_methods(cls) -> set:
+        return cls.endpoint_methods.union({"head", "options"})
 
     def _get_url(self, query_params: str = None):
         url = reverse(self.url, args=self.url_args, kwargs=self.url_kwargs)
