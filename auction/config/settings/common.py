@@ -19,6 +19,7 @@ INSTALLED_APPS = [
 
     # Third-party
     'rest_framework',
+    'djmoney',
 
     # Local apps
     'auction'
@@ -57,8 +58,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #
 #   Database
 #
-#   https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-#
 # Point to database committed to this codebase
 # TODO: change in the future to an external database host
 DATABASES = {
@@ -70,8 +69,6 @@ DATABASES = {
 
 #
 #   Password validation
-#
-#   https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 #
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -91,9 +88,8 @@ AUTH_PASSWORD_VALIDATORS = [
 #
 #   Internationalization
 #
-#   https://docs.djangoproject.com/en/3.0/topics/i18n/
-#
 LANGUAGE_CODE = 'en-us'
+# Guarantee storage for all dates in times in UTC.
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
@@ -101,7 +97,5 @@ USE_TZ = True
 
 #
 #   Static files (CSS, JavaScript, Images)
-#
-#   https://docs.djangoproject.com/en/3.0/howto/static-files/
 #
 STATIC_URL = '/static/'
