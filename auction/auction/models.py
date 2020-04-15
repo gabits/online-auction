@@ -25,7 +25,8 @@ class AuctionItem(models.Model):
         null=True,
         related_name="auction_items",
         on_delete=models.SET_NULL,
-        help_text="Item owner."
+        help_text="Item owner.",
+        db_index=True
     )
     name = models.CharField(max_length=255)
     description = models.TextField(help_text="Item description.")
@@ -35,7 +36,15 @@ class AuctionItem(models.Model):
         default_currency="GBP",
         help_text="Starting price for the auction."
     )
+    highest_bid = models.OneToOneField()
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        # Index the database table first by user, then by
+        # latest time of items creation.
+        indexes = [
+            models.Index(fields=['user', '-created_at'])
+        ]
 
 
 class AuctionBid(models.Model):
@@ -70,6 +79,13 @@ class AuctionBid(models.Model):
     )
     submitted_at = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        # Index the database table first by user, then by most recent
+        # submission time, which means the bid is higher.
+        indexes = [
+            models.Index(fields=['item', '-submitted_at'])
+        ]
+
 
 class Sale(models.Model):
     """
@@ -78,7 +94,7 @@ class Sale(models.Model):
     item = models.OneToOneField(
         AuctionItem,
         related_name="sale_record",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     bid = models.OneToOneField(
         AuctionBid,
@@ -89,5 +105,7 @@ class Sale(models.Model):
     )
     closed_at = models.DateTimeField(
         default=timezone.now,
-        help_text="Date and time (aware) of when the sale was done."
+        help_text="Date and time (aware) of when the sale was done.",
+        # Index the table by time of sale closure.
+        db_index=True
     )
