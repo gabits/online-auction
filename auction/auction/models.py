@@ -1,23 +1,19 @@
+# Python standard
 import uuid
 
-from django.conf.global_settings import AUTH_USER_MODEL
+# Django
 from django.db import models
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
 
+# Local
+from common.models import UserProfile
+
 
 class AuctionItem(models.Model):
-    public_id = models.UUIDField(
-        unique=True,
-        editable=False,
-        default=uuid.uuid4,
-        help_text="Public identifier to be exposed in the API."
-    )
-    name = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
-
-
-class AuctionBid(models.Model):
+    """
+    Store an individual item placed for auction by a user.
+    """
     public_id = models.UUIDField(
         unique=True,
         editable=False,
@@ -25,14 +21,73 @@ class AuctionBid(models.Model):
         help_text="Public identifier to be exposed in the API."
     )
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        UserProfile,
+        null=True,
+        related_name="auction_items",
+        on_delete=models.SET_NULL,
+        help_text="Item owner."
+    )
+    name = models.CharField(max_length=255)
+    description = models.TextField(help_text="Item description.")
+    base_price = MoneyField(
+        max_digits=19,
+        decimal_places=2,
+        default_currency="GBP",
+        help_text="Starting price for the auction."
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+
+
+class AuctionBid(models.Model):
+    """
+    Record a bid made by a user on an auction item.
+    """
+    public_id = models.UUIDField(
+        unique=True,
+        editable=False,
+        default=uuid.uuid4,
+        help_text="Public identifier to be exposed in the API."
+    )
+    user = models.ForeignKey(
+        UserProfile,
         related_name="bids",
         on_delete=models.SET_NULL,
-        null=True
+        help_text="Bidding user."
     )
-    submitted_at = models.DateTimeField(default=timezone.now)
+    item = models.ForeignKey(
+        AuctionItem,
+        related_name="bids",
+        on_delete=models.CASCADE
+    )
     price = MoneyField(
         max_digits=19,
         decimal_places=2,
-        default_currency="GBP"
+        default_currency="GBP",
+        help_text=(
+            "The bidding price offered, stored in 2 decimal places. "
+            "Default currency is in Sterling Pounds."
+        )
+    )
+    submitted_at = models.DateTimeField(default=timezone.now)
+
+
+class Sale(models.Model):
+    """
+    Record a sale once an auction is closed and the respective winning bid.
+    """
+    item = models.OneToOneField(
+        AuctionItem,
+        related_name="sale_record",
+        on_delete=models.CASCADE
+    )
+    bid = models.OneToOneField(
+        AuctionBid,
+        null=True,
+        related_name="sale_record",
+        on_delete=models.CASCADE,
+        help_text="The winning bid."
+    )
+    closed_at = models.DateTimeField(
+        default=timezone.now,
+        help_text="Date and time (aware) of when the sale was done."
     )
