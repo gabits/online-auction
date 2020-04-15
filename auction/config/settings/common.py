@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     'djmoney',
 
     # Local apps
-    'auction'
+    'auction',
+    'common',
 ]
 
 MIDDLEWARE = [
@@ -99,3 +100,9 @@ USE_TZ = True
 #   Static files (CSS, JavaScript, Images)
 #
 STATIC_URL = '/static/'
+
+#   REST API settings
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}

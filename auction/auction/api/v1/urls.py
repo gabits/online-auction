@@ -8,4 +8,9 @@ app_name = 'v1'
 
 urlpatterns = [
     url(r'test', views.MockAPIView.as_view(), name='mock_view'),
+    url(
+        r'lot',
+        views.AuctionItemListAPIView.as_view(),
+        name='auction_item_list'
+    ),
 ]

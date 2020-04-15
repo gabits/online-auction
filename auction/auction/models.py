@@ -36,8 +36,8 @@ class AuctionItem(models.Model):
         default_currency="GBP",
         help_text="Starting price for the auction."
     )
-    highest_bid = models.OneToOneField()
     created_at = models.DateTimeField(default=timezone.now)
+    is_active = models.BooleanField(default=False)
 
     class Meta:
         # Index the database table first by user, then by
@@ -60,7 +60,7 @@ class AuctionBid(models.Model):
     user = models.ForeignKey(
         UserProfile,
         related_name="bids",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         help_text="Bidding user."
     )
     item = models.ForeignKey(
@@ -78,6 +78,15 @@ class AuctionBid(models.Model):
         )
     )
     submitted_at = models.DateTimeField(default=timezone.now)
+    # Store if this is the highest bid for the item.
+    # Defined here to prevent circular dependencies and keep consistency
+    # with the other foreign keys defined.
+    winning_item = models.OneToOneField(
+        AuctionItem,
+        null=True,
+        related_name="highest_bid",
+        on_delete=models.PROTECT
+    )
 
     class Meta:
         # Index the database table first by user, then by most recent
