@@ -33,3 +33,6 @@ class AuctionItemListAPIView(ListCreateAPIView):
     serializer_class = AuctionItemListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_active', 'user', 'created_at']
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user.user_profile)
