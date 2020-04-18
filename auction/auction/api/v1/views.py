@@ -1,6 +1,10 @@
+# Django
+from django.utils import timezone
+
 # Third-party
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     GenericAPIView,
     ListCreateAPIView,
@@ -11,8 +15,8 @@ from rest_framework.response import Response
 
 # Local
 from auction.api.v1.serializers import (
-    AuctionItemListSerializer,
     AuctionItemDetailSerializer,
+    AuctionItemListSerializer,
 )
 from auction.models import AuctionItem
 
@@ -60,4 +64,19 @@ class AuctionItemRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'public_id'
     permission_classes = (IsAuthenticated, )
     serializer_class = AuctionItemDetailSerializer
-    # TODO: users should only be able to delete an item that is inactive.
+
+    def perform_update(self, serializer):
+        serializer.save(modified_at=timezone.now())
+
+    def perform_destroy(self, instance):
+        if not instance.is_active:
+            super().perform_destroy(instance)
+        else:
+            raise ValidationError(
+                detail={
+                    "detail": (
+                        "Cannot delete a lot which is currently active. "
+                        "Please set it inactive first."
+                    )
+                }
+            )
