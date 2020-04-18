@@ -130,3 +130,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100
 }
+
+#
+#   Application data
+#
+# Default currency used for price calculations and auction; must map to one
+# of the django-money supported currencies.
+DEFAULT_CURRENCY = "GBP"

@@ -2,6 +2,7 @@
 import uuid
 
 # Django
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -34,10 +35,10 @@ class AuctionItem(SoftDeleteModel):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, help_text="Item description.")
     base_price = MoneyField(
-        null=True,
+        default="0.00",
         max_digits=19,
         decimal_places=2,
-        default_currency="GBP",
+        default_currency=settings.DEFAULT_CURRENCY,
         help_text="Starting price for the auction.",
     )
     created_at = models.DateTimeField(default=timezone.now)
@@ -75,7 +76,7 @@ class AuctionBid(SoftDeleteModel):
     price = MoneyField(
         max_digits=19,
         decimal_places=2,
-        default_currency="GBP",
+        default_currency=settings.DEFAULT_CURRENCY,
         help_text=(
             "The bidding price offered, stored in 2 decimal places. "
             "Default currency is in Sterling Pounds."
