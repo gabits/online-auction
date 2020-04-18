@@ -25,6 +25,7 @@ class AuctionItemListSerializer(serializers.ModelSerializer):
             "description",
             "base_price",
             "base_price_currency",
+            "is_active"
         )
 
 
@@ -32,5 +33,16 @@ class AuctionItemDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AuctionItem
-        fields = "__all__"
-        order_by = ('attributes', )
+        fields = read_only_fields = (
+            "public_id",
+            "created_at",
+            "user",
+            "name",
+            "description",
+            "base_price",
+            "base_price_currency",
+            "is_active",
+            "highest_bid",
+            "bids",
+            "sale_record",
+        )
