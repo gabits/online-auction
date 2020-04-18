@@ -43,6 +43,10 @@ class APITestMethodsGenerator:
 
     @staticmethod
     def add_test_scenario(klass, test_scenario):
+        """
+        Attach the generated test function to the test class so it is ran
+        when tests are executed.
+        """
         setattr(klass, test_scenario.__name__, test_scenario)
 
     @classmethod
@@ -56,12 +60,21 @@ class APITestMethodsGenerator:
 
     @classmethod
     def generate_methods_for_unauthenticated_user_request(cls, klass):
+        """
+        Create and attach test methods for HTTP requests which do not provide
+        authorization credentials, using all HTTP methods - both supported and
+        unsupported by the endpoint.
+        """
         for http_method in cls.HTTP_METHODS:
             test_scenario = cls.unauthenticated_method_test_factory(http_method)
             cls.add_test_scenario(klass, test_scenario)
 
     @classmethod
     def generate_methods_for_http_methods_not_allowed(cls, klass):
+        """
+        Create and attach test methods for each HTTP request using methods not
+        supported by the endpoint being tested.
+        """
         methods_not_allowed = cls.HTTP_METHODS.difference(
             klass.get_supported_http_methods()
         )
@@ -118,21 +131,31 @@ class APITestMethodsGenerator:
         return test_method
 
 
-class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
+class BaseAPIEndpointTestCase(APITestMethodsGenerator, TestCase):
     """
     Mixin class to help testing a single API endpoint.
 
-    Must be used in combination with Django's TestCase.
+    Inheriting from this class will create additional test methods for the
+    test case, based on the configuration provided with the test attributes.
+
+    The extended test scenarios will check for unauthorized requests and HTTP
+    requests using methods not allowed.
+
+    Public methods:
+    . `get_http_authorization`: provide request header authorization credentials
+    . `setUp`: set up method to be ran once for each individual test method
+    . `make_request`: utility method to simplify requests to specified endpoint
 
     Usage:
 
-        >>> class MyTest(APIEndpointTestMixin, TestCase):
+        >>> class MyTest(BaseAPIEndpointTestCase):
         >>>     url = 'app_name:endpoint_url'
-        >>>     endpoint_methods = {"get", "post"}
+        >>>     supported_methods = {"get", "post"}
 
     """
     # Extend amount of debug information, provided by `unittest.TestCase`
     longMessage = True
+    maxDiff = None
     # HTTP methods supported by the endpoint
     supported_methods: set
     # Name spaced internal URL name to be tested by extending class
@@ -143,17 +166,39 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
 
     @classmethod
     def get_supported_http_methods(cls) -> set:
+        """
+        Get all HTTP methods which the specified endpoint supports.
+        """
         return cls.supported_methods.union({"head", "options"})
 
     def _get_url(self, query_params: str = None) -> str:
+        """
+        Get the absolute URL path, including domain, path and encoded
+        parameters.
+        """
         url = reverse(self.url, args=self.url_args, kwargs=self.url_kwargs)
         if query_params:
             encoded_params = urllib.parse.urlencode(query_params)
             url += f"?{encoded_params}"
         return url
 
-    def make_request(self, method: str, *args, **kwargs) -> Response:
-        query_params = kwargs.pop("query_params", None)
+    def make_request(
+        self,
+        method: str,
+        *args,
+        query_params: dict = None,
+        **kwargs
+    ) -> Response:
+        """
+        Make a request to any specified HTTP method.
+
+        Can be provided any parameters supported by the `requests` library,
+        which is responsible for executing these requests.
+
+        Also supports receiving a `query_params` dictionary, which it encodes
+        in the URL before making the request, to facilitate testing URL query
+        parameters.
+        """
         url = self._get_url(query_params=query_params)
         client_method = getattr(self.client, method)
         return client_method(url, *args, **kwargs)
@@ -163,6 +208,13 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
         self.auth_user = AuthUserFactory()
 
     def get_http_authorization(self, user: AUTH_USER_MODEL = None) -> str:
+        """
+        Get full OAuth 2.0 token credentials for HTTP_AUTHORIZATION header in
+        order to make a request for the specified user only.
+
+        The credentials generated expire after 5 minutes. This method is for
+        testing purposes only.
+        """
         if not user:
             user = self.auth_user
         access_token = AccessToken.objects.create(
