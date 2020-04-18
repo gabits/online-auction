@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.generics import (
     GenericAPIView,
     ListCreateAPIView,
-    RetrieveDestroyAPIView,
+    RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -48,7 +48,7 @@ class AuctionItemListAPIView(ListCreateAPIView):
         serializer.save(user=self.request.user.user_profile)
 
 
-class AuctionItemRetrieveDestroyAPIView(RetrieveDestroyAPIView):
+class AuctionItemRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     """
     GET requests to this endpoint will retrieve an auction item, if the URL
     matches the public_id of an existing one in the system.

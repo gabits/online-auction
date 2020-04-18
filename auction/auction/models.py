@@ -42,6 +42,7 @@ class AuctionItem(SoftDeleteModel):
         help_text="Starting price for the auction.",
     )
     created_at = models.DateTimeField(default=timezone.now)
+    modified_at = models.DateTimeField(null=True)
     is_active = models.BooleanField(default=False)
 
     class Meta:
