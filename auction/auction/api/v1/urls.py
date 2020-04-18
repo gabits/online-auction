@@ -1,4 +1,5 @@
 # Django
+from django.conf import settings
 from django.conf.urls import url
 
 # Local
@@ -7,9 +8,8 @@ from auction.api.v1 import views
 app_name = 'v1'
 
 urlpatterns = [
-    url(r'test/$', views.MockAPIView.as_view(), name='mock_view'),
     url(
-        r'lot/(?P<public_id>[0-9a-z\-]+)$',
+        f'lot/(?P<public_id>{settings.UUID_REGEX_FORMAT})$',
         views.AuctionItemRetrieveUpdateDestroyAPIView.as_view(),
         name='lot_retrieve_update_destroy'
     ),

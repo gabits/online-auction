@@ -10,7 +10,7 @@ from common.models import UserProfile
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_user_profile(
-        sender, instance=None, created=False, **kwargs
+        sender, instance=None, **kwargs
 ):
     """
     Create a UserProfile for the application to store data on instead of the
@@ -20,9 +20,9 @@ def create_user_profile(
     This pattern is put in place to try ensure encapsulation principles and
     separation of concerns.
     """
-    if created or (
-            not hasattr(instance, "user_profile")
-            or instance.user_profile is None
+    if (
+        not hasattr(instance, "user_profile")
+        or instance.user_profile is None
     ):
         UserProfile.objects.create(
             auth_user=instance

@@ -21,17 +21,6 @@ from auction.api.v1.serializers import (
 from auction.models import AuctionItem
 
 
-class MockAPIView(GenericAPIView):
-    permission_classes = (IsAuthenticated, )
-    allowed_methods = ["get", "head", "options"]
-
-    def retrieve(self, request, *args, **kwargs):
-        return Response(
-            {"detail": "Not implemented."},
-            status=status.HTTP_200_OK
-        )
-
-
 class AuctionItemListAPIView(ListCreateAPIView):
     """
     GET requests to this endpoint will return a list of all existing auction

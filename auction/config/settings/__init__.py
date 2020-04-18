@@ -1,5 +1,6 @@
-# Local
-from .common import *
+# Python standard
+import os
+
 
 # Determine current environment
 APP_ENVIRONMENT = os.getenv("APP_ENVIRONMENT", "dev")
@@ -13,3 +14,5 @@ if APP_ENVIRONMENT == "dev":
     from .development import *
 elif APP_ENVIRONMENT == "prod":
     from .production import *
+elif APP_ENVIRONMENT == "test":
+    from .automated_tests import *

@@ -1,5 +1,6 @@
-# Python standard
-import os
+# Local
+from .common import *
+
 
 DEBUG = True
 

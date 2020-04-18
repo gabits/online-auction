@@ -1,16 +1,22 @@
 # Python standard
 import urllib
+from datetime import timedelta
 from typing import Callable
 
 # Django
+from django.conf import settings
+from django.conf.global_settings import AUTH_USER_MODEL
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 # Third-party
+from oauth2_provider.models import AccessToken
+from requests import Response
 from rest_framework import status
 
 # Local
-from common.tests.factories import UserFactory
+from common.tests.factories import AuthUserFactory
 
 
 class APITestMethodsGenerator:
@@ -71,7 +77,7 @@ class APITestMethodsGenerator:
         """
         def _unauthenticated_method_test(self):
             response = self.make_request(http_method)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
             self.assertEqual(
                 bytes.decode(response.rendered_content, "utf-8"),
                 '{"detail":"Authentication credentials were not provided."}'
@@ -90,8 +96,11 @@ class APITestMethodsGenerator:
         HTTP request method, named accordingly.
         """
         def _not_allowed_method_test(self):
-            self.authenticate()
-            response = self.make_request(http_method)
+            http_auth = self.get_http_authorization()
+            response = self.make_request(
+                http_method,
+                HTTP_AUTHORIZATION=http_auth
+            )
             self.assertEqual(
                 response.status_code,
                 status.HTTP_405_METHOD_NOT_ALLOWED
@@ -125,7 +134,7 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
     # Extend amount of debug information, provided by `unittest.TestCase`
     longMessage = True
     # HTTP methods supported by the endpoint
-    endpoint_methods: set
+    supported_methods: set
     # Name spaced internal URL name to be tested by extending class
     url: str
     # Args and kwargs to provide the URL so it can successfully reverse it
@@ -134,23 +143,32 @@ class APIEndpointTestMixin(APITestMethodsGenerator, TestCase):
 
     @classmethod
     def get_supported_http_methods(cls) -> set:
-        return cls.endpoint_methods.union({"head", "options"})
+        return cls.supported_methods.union({"head", "options"})
 
-    def _get_url(self, query_params: str = None):
+    def _get_url(self, query_params: str = None) -> str:
         url = reverse(self.url, args=self.url_args, kwargs=self.url_kwargs)
         if query_params:
             encoded_params = urllib.parse.urlencode(query_params)
             url += f"?{encoded_params}"
         return url
 
-    def make_request(self, method: str, *args, **kwargs):
+    def make_request(self, method: str, *args, **kwargs) -> Response:
         query_params = kwargs.pop("query_params", None)
         url = self._get_url(query_params=query_params)
         client_method = getattr(self.client, method)
         return client_method(url, *args, **kwargs)
 
     def setUp(self):
-        self.user = UserFactory()
+        super().setUp()
+        self.auth_user = AuthUserFactory()
 
-    def authenticate(self):
-        self.client.force_login(self.user)
+    def get_http_authorization(self, user: AUTH_USER_MODEL = None) -> str:
+        if not user:
+            user = self.auth_user
+        access_token = AccessToken.objects.create(
+            user=user,
+            scope="read write",
+            expires=timezone.now() + timedelta(seconds=300),
+            token="secret-access-token-key",
+        )
+        return f"{settings.OAUTH2_AUTHORIZATION_SCHEME} {access_token}"

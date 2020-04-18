@@ -1,6 +1,7 @@
 # Python standard
 import os
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 #
@@ -137,3 +138,11 @@ REST_FRAMEWORK = {
 # Default currency used for price calculations and auction; must map to one
 # of the django-money supported currencies.
 DEFAULT_CURRENCY = "GBP"
+
+# UUID regex to match expected URLs identifiers
+UUID_REGEX_FORMAT = (
+    "[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}"
+)
+
+# OAuth token scheme
+OAUTH2_AUTHORIZATION_SCHEME = "Bearer"
