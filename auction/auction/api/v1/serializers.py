@@ -25,7 +25,7 @@ class AuctionItemListSerializer(serializers.ModelSerializer):
         )
 
 
-class AuctionItemDetailSerializer(serializers.HyperlinkedModelSerializer):
+class AuctionItemDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AuctionItem

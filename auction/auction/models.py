@@ -4,13 +4,16 @@ import uuid
 # Django
 from django.db import models
 from django.utils import timezone
+
+# Third-party
 from djmoney.models.fields import MoneyField
+from softdelete.models import SoftDeleteModel
 
 # Local
 from common.models import UserProfile
 
 
-class AuctionItem(models.Model):
+class AuctionItem(SoftDeleteModel):
     """
     Store an individual item placed for auction by a user.
     """
@@ -48,7 +51,7 @@ class AuctionItem(models.Model):
         ]
 
 
-class AuctionBid(models.Model):
+class AuctionBid(SoftDeleteModel):
     """
     Record a bid made by a user on an auction item.
     """

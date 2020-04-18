@@ -5,8 +5,11 @@ import uuid
 from django.conf.global_settings import AUTH_USER_MODEL
 from django.db import models
 
+# Third-party
+from softdelete.models import SoftDeleteModel
 
-class UserProfile(models.Model):
+
+class UserProfile(SoftDeleteModel):
     """
     Map a Django auth user (used to store credentials and session information)
     to an internal profile used by the application to store business logic.
