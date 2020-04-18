@@ -6,10 +6,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #
 #   Application definitions
 #
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+]
 
 INSTALLED_APPS = [
-    # Django
+    #
+    #   Django
+    #
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -17,17 +21,29 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third-party
+    #
+    #   Third-party
+    #
+    # REST APIs
     'rest_framework',
+    # OAuth 2.0 authentication
     'oauth2_provider',
+    # Support cross-domain browser requests for authentication with OAuth
+    # coming from external clients
+    'corsheaders',
+    # Django library to support money calculations and conversions
     'djmoney',
 
-    # Local apps
+    #
+    #   Local apps
+    #
     'auction',
     'common',
 ]
 
 MIDDLEWARE = [
+    # CorsMiddleware should be placed as high as possible
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -36,6 +52,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Support cross-origin requests for any requesting client - might not be
+# suitable for Production version
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'config.site.urls'
 

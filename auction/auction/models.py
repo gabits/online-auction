@@ -29,12 +29,13 @@ class AuctionItem(models.Model):
         db_index=True
     )
     name = models.CharField(max_length=255)
-    description = models.TextField(help_text="Item description.")
+    description = models.TextField(null=True, help_text="Item description.")
     base_price = MoneyField(
+        null=True,
         max_digits=19,
         decimal_places=2,
         default_currency="GBP",
-        help_text="Starting price for the auction."
+        help_text="Starting price for the auction.",
     )
     created_at = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=False)

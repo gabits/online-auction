@@ -1,7 +1,10 @@
 # Third-party
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import (
+    GenericAPIView,
+    ListCreateAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -20,7 +23,7 @@ class MockAPIView(GenericAPIView):
         )
 
 
-class AuctionItemListAPIView(ListAPIView):
+class AuctionItemListAPIView(ListCreateAPIView):
     """
     List all existing auction items. Results can be queried by some fields -
     such as active or inactive items - and can also be ordered.

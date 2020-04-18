@@ -19,15 +19,23 @@ class AuctionItemListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class AuctionItemDetailSerializer(serializers.HyperlinkedModelSerializer):
+    user = serializers.HyperlinkedRelatedField(
+        view_name='user-detail',
+        lookup_field='username',
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = AuctionItem
-        fields = read_only_fields = (
+        read_only_fields = (
             "public_id",
+            "highest_bid",
+            "created_at"
+        )
+        fields = read_only_fields + (
             "user",
             "name",
             "description",
-            "base_price",
-            "highest_bid",
-            "created_at"
+            "base_price"
         )
