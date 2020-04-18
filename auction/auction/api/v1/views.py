@@ -3,15 +3,13 @@ from django.utils import timezone
 
 # Third-party
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import (
-    GenericAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 # Local
 from auction.api.v1.serializers import (
@@ -34,8 +32,10 @@ class AuctionItemListAPIView(ListCreateAPIView):
     queryset = AuctionItem.objects.all()
     permission_classes = (IsAuthenticated, )
     serializer_class = AuctionItemListSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['is_active', 'user', 'created_at']
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ('is_active', 'user__public_id', 'name')
+    search_fields = ('name', 'description', 'base_price')
+    ordering_fields = ('name', 'created_at', 'modified_at', 'base_price')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user.user_profile)

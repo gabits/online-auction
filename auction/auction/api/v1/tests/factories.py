@@ -16,6 +16,11 @@ class AuctionItemFactory(DjangoModelFactory):
     name = LazyAttribute(lambda obj: fake.sentence())
     description = LazyAttribute(lambda obj: fake.text())
     is_active = LazyAttribute(lambda obj: fake.pybool())
+    base_price = LazyAttribute(
+        lambda obj: str(
+            fake.pydecimal(right_digits=2, min_value=0.00, max_value=1000.00)
+        )
+    )
 
     class Meta:
         model = AuctionItem
@@ -23,7 +28,11 @@ class AuctionItemFactory(DjangoModelFactory):
 
 class AuctionBidFactory(DjangoModelFactory):
     item = AuctionItemFactory()
-    price = LazyAttribute(lambda obj: str(fake.pydecimal(right_digits=2)))
+    price = LazyAttribute(
+        lambda obj: str(
+            fake.pydecimal(right_digits=2, min_value=0.00, max_value=1000.00)
+        )
+    )
     user = SubFactory(UserProfileFactory)
 
     class Meta:
