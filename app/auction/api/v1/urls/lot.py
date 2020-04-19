@@ -19,8 +19,13 @@ urlpatterns = [
     ),
     # Collection endpoint for lot bids
     re_path(
-        f'^(?P<lot_public_id>{settings.UUID_REGEX_FORMAT})/bids$',
+        f'^(?P<lot_public_id>{settings.UUID_REGEX_FORMAT})/history$',
         views.BidListAPIView.as_view(),
-        name='bidding_history'
+        name='bid_history'
+    ),
+    re_path(
+        f'^(?P<lot_public_id>{settings.UUID_REGEX_FORMAT})/bid$',
+        views.BidCreateAPIView.as_view(),
+        name='bid_create'
     )
 ]

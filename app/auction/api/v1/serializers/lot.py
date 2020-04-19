@@ -82,7 +82,7 @@ class LotDetailSerializer(BaseLotSerializer):
         return url
 
     def get_bids(self, object) -> str:
-        view_name = "api:auction:v1:lot:bidding_history"
+        view_name = "api:auction:v1:lot:bid_history"
         path = reverse(view_name, kwargs={"lot_public_id": object.public_id})
         url = self.context["request"].build_absolute_uri(path)
         return url

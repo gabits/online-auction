@@ -113,27 +113,3 @@ class Bid(SoftDeleteModel):
         indexes = [
             models.Index(fields=['lot', '-submitted_at'])
         ]
-
-
-class Sale(models.Model):
-    """
-    Record a sale once an auction is closed and the respective winning bid.
-    """
-    lot = models.OneToOneField(
-        Lot,
-        related_name="sale_record",
-        on_delete=models.CASCADE,
-    )
-    bid = models.OneToOneField(
-        Bid,
-        null=True,
-        related_name="sale_record",
-        on_delete=models.CASCADE,
-        help_text="The winning bid."
-    )
-    closed_at = models.DateTimeField(
-        default=timezone.now,
-        help_text="Date and time (in UTC) of when the sale was done.",
-        # Index the table by time of sale closure.
-        db_index=True
-    )
