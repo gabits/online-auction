@@ -19,6 +19,7 @@ Ensure you have installed locally the following:
 Ensure Python 3.7.4 is on your PATH and run:
 ```bash
  ./setup.sh
+ ./run.sh
 ``` 
 
 ## Manual set up
@@ -59,12 +60,18 @@ database servers or message brokers.
 
 ## Testing
 ### Manual tests
+
+**Note: Skip this step if you have used the automated set up method.**
+
+#### Load fixtures
 To test locally, load seed data to provide testing fixtures. Note that this 
 command should be ran on an empty database, otherwise you may get integrity
 errors from data conflicts due to unique fields constraints.
 ```bash
  ./app/manage.py loaddata seed_data.json
 ```
+
+#### Log in
 Once that's done, you should have loaded in your database the default user 
 information for login and API requests:
 ```bash
@@ -81,17 +88,31 @@ management command to create a superuser:
 ``` 
 
 ### Automated tests
-Automated tests for this platform can be ran using Django's usual test command.
-You must either specify the test settings flag or set an environment variable
-in order to use a dedicated database for testing. 
+Run tests with the following script:
+```bash
+ # Execute all tests
+ ./test.sh
 
-A dedicated database to run tests  is strongly recommended, because otherwise tests may find conflicts with data or accidentally flush
-an existing database that was pre-populated.
+ # Execute just a module
+ ./test.sh path.to.module
+ # or
+ ./test.sh path/to/module.py
+```
+
+Automated tests for this platform can also be ran using Django's usual test 
+command. You must either specify the test settings flag or set an environment 
+variable in order to use a dedicated database for testing. 
+
+A dedicated database to run tests is strongly recommended, because otherwise 
+tests may find conflicts with data or accidentally flush an existing database 
+that was pre-populated.
 ```bash
  # Run all test suite for an app
  ./app/manage.py test [app_name]
-# e.g.
+ # e.g.
  ./app/manage.py test auction
+ # with settings flag, in case you have not set the env var APP_ENVIRONMENT
+ ./app/manage.py test auction --settings=config.settings.automated_tests
 
  # Run individual tests
  ./app/manage.py test path.to.module
