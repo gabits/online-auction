@@ -12,7 +12,7 @@ from common.tests.mixins import (
 
 
 class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
-    url = "api:auction:v1:lot_list_create"
+    url = "api:auction:v1:lots:list_create"
     supported_methods = {"get", "post"}
 
     def setUp(self):
@@ -182,7 +182,7 @@ class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
 
 
 class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
-    url = "api:auction:v1:lot_list_create"
+    url = "api:auction:v1:lots:list_create"
     supported_methods = {"get", "post"}
 
     def test_user_can_create_lot_with_minimal_information(self):
@@ -249,7 +249,7 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
 
 
 class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
-    url = "api:auction:v1:lot_retrieve_update_destroy"
+    url = "api:auction:v1:lots:retrieve_update_destroy"
     supported_methods = {"get", "put", "patch", "delete"}
 
     def setUp(self):
@@ -316,7 +316,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
 
 
 class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
-    url = "api:auction:v1:lot_retrieve_update_destroy"
+    url = "api:auction:v1:lots:retrieve_update_destroy"
     supported_methods = {"get", "put", "patch", "delete"}
 
     def setUp(self):
@@ -545,7 +545,7 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
 
 
 class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
-    url = "api:auction:v1:lot_retrieve_update_destroy"
+    url = "api:auction:v1:lots:retrieve_update_destroy"
     supported_methods = {"get", "put", "patch", "delete"}
 
     def setUp(self):
