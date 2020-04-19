@@ -4,14 +4,14 @@ from factory.django import DjangoModelFactory
 from faker import Faker
 
 # Local
-from auction.models import AuctionBid, AuctionItem
+from auction.models import Bid, Lot
 from common.tests.factories import UserProfileFactory
 
 fake = Faker()
 
 
 # Factories to facilitate testing logic.
-class AuctionItemFactory(DjangoModelFactory):
+class LotFactory(DjangoModelFactory):
     user = SubFactory(UserProfileFactory)
     name = LazyAttribute(lambda obj: fake.sentence())
     description = LazyAttribute(lambda obj: fake.text())
@@ -23,11 +23,11 @@ class AuctionItemFactory(DjangoModelFactory):
     )
 
     class Meta:
-        model = AuctionItem
+        model = Lot
 
 
-class AuctionBidFactory(DjangoModelFactory):
-    item = AuctionItemFactory()
+class BidFactory(DjangoModelFactory):
+    item = LotFactory()
     price = LazyAttribute(
         lambda obj: str(
             fake.pydecimal(right_digits=2, min_value=0.00, max_value=1000.00)
@@ -36,4 +36,4 @@ class AuctionBidFactory(DjangoModelFactory):
     user = SubFactory(UserProfileFactory)
 
     class Meta:
-        model = AuctionBid
+        model = Bid

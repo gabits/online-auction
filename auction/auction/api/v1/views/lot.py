@@ -13,13 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 
 # Local
 from auction.api.v1.serializers import (
-    AuctionItemDetailSerializer,
-    AuctionItemListSerializer,
+    LotDetailSerializer,
+    LotListSerializer,
 )
-from auction.models import AuctionItem
+from auction.models import Lot
 
 
-class AuctionItemListAPIView(ListCreateAPIView):
+class LotListAPIView(ListCreateAPIView):
     """
     GET requests to this endpoint will return a list of all existing auction
     items. Its results can be queried by fields such as active or
@@ -29,9 +29,9 @@ class AuctionItemListAPIView(ListCreateAPIView):
     the system, which are by default inactive - not for auction - unless
     explicitly requested otherwise.
     """
-    queryset = AuctionItem.objects.all()
+    queryset = Lot.objects.all()
     permission_classes = (IsAuthenticated, )
-    serializer_class = AuctionItemListSerializer
+    serializer_class = LotListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     filterset_fields = ('is_active', 'user__public_id', 'name')
     search_fields = ('name', 'description', 'base_price')
@@ -41,7 +41,7 @@ class AuctionItemListAPIView(ListCreateAPIView):
         serializer.save(user=self.request.user.user_profile)
 
 
-class AuctionItemRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+class LotRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     """
     GET requests to this endpoint will retrieve an auction item, if the URL
     matches the public_id of an existing one in the system.
@@ -49,10 +49,10 @@ class AuctionItemRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     DELETE requests to this endpoint will attempt to delete the auction item
     from the system.
     """
-    queryset = AuctionItem.objects.all()
+    queryset = Lot.objects.all()
     lookup_field = 'public_id'
     permission_classes = (IsAuthenticated, )
-    serializer_class = AuctionItemDetailSerializer
+    serializer_class = LotDetailSerializer
 
     def perform_update(self, serializer):
         if serializer.validated_data:

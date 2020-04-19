@@ -5,11 +5,11 @@ from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 # Local
-from auction.api.v1.serializers.bid import AuctionBidListSerializer
-from auction.models import AuctionBid
+from auction.api.v1.serializers import BidListSerializer
+from auction.models import Bid
 
 
-class LotBidListAPIView(ListCreateAPIView):
+class BidListAPIView(ListCreateAPIView):
     """
     GET requests to this endpoint will return a list of all existing bids
     for a lot. Its results can be queried by fields such as active or
@@ -18,9 +18,9 @@ class LotBidListAPIView(ListCreateAPIView):
     POST requests to this endpoint will submit a bid for this auction item,
     which must provide a higher price than the current highest bid.
     """
-    queryset = AuctionBid.objects.all()
+    queryset = Bid.objects.all()
     permission_classes = (IsAuthenticated, )
-    serializer_class = AuctionBidListSerializer
+    serializer_class = BidListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     filterset_fields = []
     search_fields = []

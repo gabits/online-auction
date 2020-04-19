@@ -14,7 +14,7 @@ from softdelete.models import SoftDeleteModel
 from common.models import UserProfile
 
 
-class AuctionItem(SoftDeleteModel):
+class Lot(SoftDeleteModel):
     """
     Store an individual item placed for auction by a user.
     """
@@ -53,7 +53,7 @@ class AuctionItem(SoftDeleteModel):
         ]
 
 
-class AuctionBid(SoftDeleteModel):
+class Bid(SoftDeleteModel):
     """
     Record a bid made by a user on an auction item.
     """
@@ -70,7 +70,7 @@ class AuctionBid(SoftDeleteModel):
         help_text="Bidding user."
     )
     item = models.ForeignKey(
-        AuctionItem,
+        Lot,
         related_name="bids",
         on_delete=models.CASCADE
     )
@@ -88,7 +88,7 @@ class AuctionBid(SoftDeleteModel):
     # Defined here to prevent circular dependencies and keep consistency
     # with the other foreign keys defined.
     winning_item = models.OneToOneField(
-        AuctionItem,
+        Lot,
         null=True,
         related_name="highest_bid",
         on_delete=models.PROTECT
@@ -107,12 +107,12 @@ class Sale(models.Model):
     Record a sale once an auction is closed and the respective winning bid.
     """
     item = models.OneToOneField(
-        AuctionItem,
+        Lot,
         related_name="sale_record",
         on_delete=models.CASCADE,
     )
     bid = models.OneToOneField(
-        AuctionBid,
+        Bid,
         null=True,
         related_name="sale_record",
         on_delete=models.CASCADE,

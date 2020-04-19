@@ -2,8 +2,8 @@
 from freezegun import freeze_time
 from rest_framework import status
 
-from auction.api.v1.tests.factories import AuctionBidFactory, AuctionItemFactory
-from auction.models import AuctionItem
+from auction.api.v1.tests.factories import BidFactory, LotFactory
+from auction.models import Lot
 from common.tests.factories import UserProfileFactory
 from common.tests.mixins import (
     APITestMethodsGenerator,
@@ -41,7 +41,7 @@ class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
                 setattr(
                     self,
                     f"auction_item_{n}",
-                    AuctionItemFactory(
+                    LotFactory(
                         user=getattr(self, f"user_profile_{n}"),
                         name=f"Name {n}",
                         base_price=str(53.51 + n),
@@ -86,7 +86,7 @@ class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
         return lot_1, lot_2, lot_3
 
     def test_authenticated_get_request_when_no_auctions_returns_empty(self):
-        AuctionItem.objects.delete()
+        Lot.objects.delete()
         http_auth = self.get_http_authorization(self.auth_user)
         response = self.make_request("get", HTTP_AUTHORIZATION=http_auth)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -186,7 +186,7 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
     supported_methods = {"get", "post"}
 
     def test_user_can_create_lot_with_minimal_information(self):
-        self.assertEquals(AuctionItem.objects.count(), 0)
+        self.assertEquals(Lot.objects.count(), 0)
         create_data = {"name": "Old Portrait"}
         http_auth = self.get_http_authorization(self.auth_user)
         with freeze_time("2020-04-18 04:35:01"):
@@ -196,8 +196,8 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
                 data=create_data
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(AuctionItem.objects.count(), 1)
-        item = AuctionItem.objects.get()
+        self.assertEquals(Lot.objects.count(), 1)
+        item = Lot.objects.get()
         expected_result = {
             "public_id": str(item.public_id),
             "created_at": "2020-04-18T04:35:01Z",
@@ -211,7 +211,7 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEqual(response.json(), expected_result)
 
     def test_user_can_create_lot_with_maximum_information(self):
-        self.assertEquals(AuctionItem.objects.count(), 0)
+        self.assertEquals(Lot.objects.count(), 0)
         create_data = {
             "name": "Old Portrait",
             "description": "An old, dusty family portrait.",
@@ -227,8 +227,8 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
                 data=create_data
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(AuctionItem.objects.count(), 1)
-        item = AuctionItem.objects.get()
+        self.assertEquals(Lot.objects.count(), 1)
+        item = Lot.objects.get()
         expected_result = {
             "public_id": str(item.public_id),
             "created_at": "2020-04-18T04:35:01Z",
@@ -255,7 +255,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
     def setUp(self):
         super().setUp()
         with freeze_time("2019-12-19 04:35:01"):
-            self.auction_item = AuctionItemFactory(
+            self.auction_item = LotFactory(
                 user=self.auth_user.user_profile,
                 base_price="46.00",
                 name="Grandma's Music Box",
@@ -266,7 +266,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
             setattr(
                 self,
                 f"bid_{n}",
-                AuctionBidFactory(item=self.auction_item)
+                BidFactory(item=self.auction_item)
             )
         self.url_args = [self.auction_item.public_id]
 
@@ -299,7 +299,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
         # Confirm that the UUID is not in use as any auction item public id
         self.assertFalse(
-            AuctionItem.objects.filter(public_id=non_existing_uuid).exists()
+            Lot.objects.filter(public_id=non_existing_uuid).exists()
         )
         self.url_args = [non_existing_uuid]
         http_auth = self.get_http_authorization(self.auth_user)
@@ -322,7 +322,7 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
     def setUp(self):
         super().setUp()
         with freeze_time("2019-12-19 04:35:01"):
-            self.auction_item = AuctionItemFactory(
+            self.auction_item = LotFactory(
                 user=self.auth_user.user_profile,
                 base_price="46.00",
                 name="Grandma's Music Box",
@@ -474,7 +474,7 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
         # Confirm that the UUID is not in use as any auction item public id
         self.assertFalse(
-            AuctionItem.objects.filter(public_id=non_existing_uuid).exists()
+            Lot.objects.filter(public_id=non_existing_uuid).exists()
         )
         self.url_args = [non_existing_uuid]
         http_auth = self.get_http_authorization(self.auth_user)
@@ -495,7 +495,7 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
         # Confirm that the UUID is not in use as any auction item public id
         self.assertFalse(
-            AuctionItem.objects.filter(public_id=non_existing_uuid).exists()
+            Lot.objects.filter(public_id=non_existing_uuid).exists()
         )
         self.url_args = [non_existing_uuid]
         http_auth = self.get_http_authorization(self.auth_user)
@@ -550,7 +550,7 @@ class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
 
     def setUp(self):
         super().setUp()
-        self.auction_item = AuctionItemFactory(user=self.auth_user.user_profile)
+        self.auction_item = LotFactory(user=self.auth_user.user_profile)
         self.url_args = [self.auction_item.public_id]
 
     def test_active_lot_cannot_be_deleted_with_endpoint(self):
@@ -575,7 +575,7 @@ class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
 
         # Confirm that the item has NOT been deleted from the database
         self.assertQuerysetEqual(
-            AuctionItem.objects.all(),
+            Lot.objects.all(),
             [repr(self.auction_item)]
         )
         self.auction_item.refresh_from_db()
@@ -594,7 +594,7 @@ class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEqual(response.content.decode("utf-8"), "")
 
         # Confirm that the item has been deleted from the database
-        self.assertQuerysetEqual(AuctionItem.objects.all(), [])
+        self.assertQuerysetEqual(Lot.objects.all(), [])
         self.auction_item.refresh_from_db()
         self.assertEqual(
             self.auction_item.deleted_at.strftime("%Y-%m-%d %H:%M:%s"),

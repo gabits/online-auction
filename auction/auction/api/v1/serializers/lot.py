@@ -2,17 +2,17 @@
 from rest_framework import serializers
 
 # Local
-from auction.models import AuctionItem
+from auction.models import Lot
 
 
 # Serializers used are all hyperlinked to follow REST API guidelines.
 #
 # TODO: Change this ModelSerializer to a HyperlinkedModelSerializer after
 #  /bids/ and /user/ endpoints are implemented so we can hyperlink them
-class AuctionItemListSerializer(serializers.ModelSerializer):
+class LotListSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AuctionItem
+        model = Lot
         read_only_fields = (
             "public_id",
             "created_at",
@@ -27,10 +27,10 @@ class AuctionItemListSerializer(serializers.ModelSerializer):
         )
 
 
-class AuctionItemDetailSerializer(serializers.ModelSerializer):
+class LotDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AuctionItem
+        model = Lot
         read_only_fields = (
             "public_id",
             "created_at",
