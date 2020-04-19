@@ -12,13 +12,14 @@ from auction.models import Bid
 class BidListAPIView(ListCreateAPIView):
     """
     GET requests to this endpoint will return a list of all existing bids
-    for a lot. Its results can be queried by fields such as active or
-    inactive items, which can also be ordered.
+    for a lot. Results can be ordered and queried by relevant fields, such as
+    price offered, time submitted or user.
 
-    POST requests to this endpoint will submit a bid for this auction item,
-    which must provide a higher price than the current highest bid.
+    POST requests to this endpoint will submit a bid for this lot, which must
+    provide a higher price than the current highest bid.
     """
     queryset = Bid.objects.all()
+    lookup_field = "lot"
     permission_classes = (IsAuthenticated, )
     serializer_class = BidListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]

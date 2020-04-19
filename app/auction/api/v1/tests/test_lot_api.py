@@ -17,7 +17,7 @@ class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
 
     def setUp(self):
         """
-        Set up a few auction items, each created by a different user,
+        Set up a few lots, each created by a different user,
         with different attributes such as name and description, and test that
         they are returned by the API as the expected formats and with
         accurate data (reflecting the database).
@@ -30,8 +30,8 @@ class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
         ]
         super().setUp()
         for n in range(1, 4):
-            # Create auction items with different created_at times so we can
-            # have a production-like scenario
+            # Create lots with different created_at times to reproduce a
+            # production-like scenario
             setattr(
                 self,
                 f"user_profile_{n}",
@@ -40,13 +40,13 @@ class TestLotListAPIEndpoint(BaseAPIEndpointTestCase):
             with freeze_time(f"2019-12-19 0{n}:35:01"):
                 setattr(
                     self,
-                    f"auction_item_{n}",
+                    f"lot_{n}",
                     LotFactory(
                         user=getattr(self, f"user_profile_{n}"),
                         name=f"Name {n}",
                         base_price=str(53.51 + n),
                         description=f"Description {n}",
-                        # Create active and inactive items
+                        # Create active and inactive lots
                         is_active=bool(n % 2),
                         public_id=uuid_list[n - 1]
                     )
@@ -197,9 +197,9 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(Lot.objects.count(), 1)
-        item = Lot.objects.get()
+        lot = Lot.objects.get()
         expected_result = {
-            "public_id": str(item.public_id),
+            "public_id": str(lot.public_id),
             "created_at": "2020-04-18T04:35:01Z",
             "user": self.auth_user.user_profile.id,
             "name": "Old Portrait",
@@ -228,9 +228,9 @@ class TestLotCreateAPIEndpoint(BaseAPIEndpointTestCase):
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(Lot.objects.count(), 1)
-        item = Lot.objects.get()
+        lot = Lot.objects.get()
         expected_result = {
-            "public_id": str(item.public_id),
+            "public_id": str(lot.public_id),
             "created_at": "2020-04-18T04:35:01Z",
             "user": self.auth_user.user_profile.id,
             "name": "Old Portrait",
@@ -255,7 +255,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
     def setUp(self):
         super().setUp()
         with freeze_time("2019-12-19 04:35:01"):
-            self.auction_item = LotFactory(
+            self.lot = LotFactory(
                 user=self.auth_user.user_profile,
                 base_price="46.00",
                 name="Grandma's Music Box",
@@ -266,9 +266,9 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
             setattr(
                 self,
                 f"bid_{n}",
-                BidFactory(item=self.auction_item)
+                BidFactory(lot=self.lot)
             )
-        self.url_args = [self.auction_item.public_id]
+        self.url_args = [self.lot.public_id]
 
     def test_authenticated_get_request_to_existing_auction_returns_200(self):
         http_auth = self.get_http_authorization(self.auth_user)
@@ -289,7 +289,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
             "is_active": True,
             "modified_at": None,
             "name": "Grandma's Music Box",
-            "public_id": str(self.auction_item.public_id),
+            "public_id": str(self.lot.public_id),
             "sale_record": None,
             "user": self.auth_user.user_profile.id
         }
@@ -297,7 +297,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
 
     def test_authenticated_get_request_to_invalid_auction_returns_404(self):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
-        # Confirm that the UUID is not in use as any auction item public id
+        # Confirm that the UUID is not in use as any lot public id
         self.assertFalse(
             Lot.objects.filter(public_id=non_existing_uuid).exists()
         )
@@ -308,7 +308,7 @@ class TestLotRetrieveAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEquals(response.json(), {'detail': 'Not found.'})
 
     def test_authenticated_get_request_to_deleted_auction_returns_404(self):
-        self.auction_item.delete()
+        self.lot.delete()
         http_auth = self.get_http_authorization(self.auth_user)
         response = self.make_request("get", HTTP_AUTHORIZATION=http_auth)
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -322,14 +322,14 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
     def setUp(self):
         super().setUp()
         with freeze_time("2019-12-19 04:35:01"):
-            self.auction_item = LotFactory(
+            self.lot = LotFactory(
                 user=self.auth_user.user_profile,
                 base_price="46.00",
                 name="Grandma's Music Box",
                 description="Beautiful antique that belonged to my granny.",
                 is_active=True
             )
-        self.url_args = [self.auction_item.public_id]
+        self.url_args = [self.lot.public_id]
 
     @property
     def partial_update_data(self):
@@ -365,16 +365,16 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
             "is_active": False,
             "modified_at": "2020-04-10T09:11:34Z",
             "name": "Grandma's Music Box",
-            "public_id": str(self.auction_item.public_id),
+            "public_id": str(self.lot.public_id),
             "sale_record": None,
             "user": self.auth_user.user_profile.id
         }
         self.assertEquals(response.json(), expected_response)
 
         # Confirm that the table has added a modified_at record
-        self.auction_item.refresh_from_db()
+        self.lot.refresh_from_db()
         self.assertEqual(
-            self.auction_item.modified_at.strftime("%Y-%m-%d %H:%M:%s"),
+            self.lot.modified_at.strftime("%Y-%m-%d %H:%M:%s"),
             "2020-04-10 09:11:1586509894"
         )
 
@@ -398,16 +398,16 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
             "is_active": False,
             "modified_at": "2020-04-10T09:11:34Z",
             "name": "Updated name",
-            "public_id": str(self.auction_item.public_id),
+            "public_id": str(self.lot.public_id),
             "sale_record": None,
             "user": self.auth_user.user_profile.id
         }
         self.assertEquals(response.json(), expected_response)
 
         # Confirm that the table has added a modified_at record
-        self.auction_item.refresh_from_db()
+        self.lot.refresh_from_db()
         self.assertEqual(
-            self.auction_item.modified_at.strftime("%Y-%m-%d %H:%M:%s"),
+            self.lot.modified_at.strftime("%Y-%m-%d %H:%M:%s"),
             "2020-04-10 09:11:1586509894"
         )
 
@@ -437,15 +437,15 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
             "is_active": True,
             "modified_at": None,
             "name": "Grandma's Music Box",
-            "public_id": str(self.auction_item.public_id),
+            "public_id": str(self.lot.public_id),
             "sale_record": None,
             "user": self.auth_user.user_profile.id
         }
         self.assertEquals(response.json(), expected_response)
 
         # Confirm that the table has added a modified_at record
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.modified_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.modified_at)
 
     def test_read_only_parameters_to_auction_bad_request(self):
         read_only_parameters = {
@@ -467,12 +467,12 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEquals(response.json(), expected_response)
 
         # Confirm that the table has added a modified_at record
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.modified_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.modified_at)
 
     def test_authenticated_patch_request_to_invalid_auction_returns_404(self):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
-        # Confirm that the UUID is not in use as any auction item public id
+        # Confirm that the UUID is not in use as any lot public id
         self.assertFalse(
             Lot.objects.filter(public_id=non_existing_uuid).exists()
         )
@@ -488,12 +488,12 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEquals(response.json(), {'detail': 'Not found.'})
 
         # Confirm that there was no modification in the database
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.modified_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.modified_at)
 
     def test_authenticated_put_request_to_invalid_auction_returns_404(self):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
-        # Confirm that the UUID is not in use as any auction item public id
+        # Confirm that the UUID is not in use as any lot public id
         self.assertFalse(
             Lot.objects.filter(public_id=non_existing_uuid).exists()
         )
@@ -508,11 +508,11 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
         # Confirm that there was no modification in the database
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.modified_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.modified_at)
 
     def test_authenticated_patch_request_to_deleted_auction_returns_404(self):
-        self.auction_item.delete()
+        self.lot.delete()
         http_auth = self.get_http_authorization(self.auth_user)
         response = self.make_request(
             "patch",
@@ -524,11 +524,11 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEquals(response.json(), {'detail': 'Not found.'})
 
         # Confirm that there was no modification in the database
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.modified_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.modified_at)
 
     def test_authenticated_put_request_to_deleted_auction_returns_404(self):
-        self.auction_item.delete()
+        self.lot.delete()
         http_auth = self.get_http_authorization(self.auth_user)
         response = self.make_request(
             "put",
@@ -540,8 +540,8 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEquals(response.json(), {'detail': 'Not found.'})
 
         # Confirm that there was no modification in the database
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.modified_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.modified_at)
 
 
 class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
@@ -550,13 +550,13 @@ class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
 
     def setUp(self):
         super().setUp()
-        self.auction_item = LotFactory(user=self.auth_user.user_profile)
-        self.url_args = [self.auction_item.public_id]
+        self.lot = LotFactory(user=self.auth_user.user_profile)
+        self.url_args = [self.lot.public_id]
 
     def test_active_lot_cannot_be_deleted_with_endpoint(self):
-        # Set the auction item active
-        self.auction_item.is_active = True
-        self.auction_item.save()
+        # Set the lot active
+        self.lot.is_active = True
+        self.lot.save()
 
         # Make request and confirm expected response and status code
         http_auth = self.get_http_authorization(self.auth_user)
@@ -573,18 +573,18 @@ class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
             }
         )
 
-        # Confirm that the item has NOT been deleted from the database
+        # Confirm that the lot has NOT been deleted from the database
         self.assertQuerysetEqual(
             Lot.objects.all(),
-            [repr(self.auction_item)]
+            [repr(self.lot)]
         )
-        self.auction_item.refresh_from_db()
-        self.assertIsNone(self.auction_item.deleted_at)
+        self.lot.refresh_from_db()
+        self.assertIsNone(self.lot.deleted_at)
 
     def test_inactive_lot_is_successfully_soft_deleted(self):
-        # Set the auction item inactive
-        self.auction_item.is_active = False
-        self.auction_item.save()
+        # Set the lot inactive
+        self.lot.is_active = False
+        self.lot.save()
 
         # Make request and confirm expected response and status code
         http_auth = self.get_http_authorization(self.auth_user)
@@ -593,11 +593,11 @@ class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(response.content.decode("utf-8"), "")
 
-        # Confirm that the item has been deleted from the database
+        # Confirm that the lot has been deleted from the database
         self.assertQuerysetEqual(Lot.objects.all(), [])
-        self.auction_item.refresh_from_db()
+        self.lot.refresh_from_db()
         self.assertEqual(
-            self.auction_item.deleted_at.strftime("%Y-%m-%d %H:%M:%s"),
+            self.lot.deleted_at.strftime("%Y-%m-%d %H:%M:%s"),
             "2020-02-10 10:00:1581328800"
         )
 

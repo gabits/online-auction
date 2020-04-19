@@ -27,13 +27,16 @@ class Lot(SoftDeleteModel):
     user = models.ForeignKey(
         UserProfile,
         null=True,
-        related_name="auction_items",
+        related_name="lots",
         on_delete=models.SET_NULL,
-        help_text="Item owner.",
+        help_text="Lot owner.",
         db_index=True
     )
     name = models.CharField(max_length=255)
-    description = models.TextField(null=True, help_text="Item description.")
+    description = models.TextField(
+        null=True,
+        help_text="Description of the item for auction."
+    )
     base_price = MoneyField(
         default="0.00",
         max_digits=19,
@@ -47,7 +50,7 @@ class Lot(SoftDeleteModel):
 
     class Meta:
         # Index the database table first by user, then by
-        # latest time of items creation.
+        # latest time of lot creation.
         indexes = [
             models.Index(fields=['user', '-created_at'])
         ]
@@ -55,7 +58,7 @@ class Lot(SoftDeleteModel):
 
 class Bid(SoftDeleteModel):
     """
-    Record a bid made by a user on an auction item.
+    Record a bid made by a user for a lot.
     """
     public_id = models.UUIDField(
         unique=True,
@@ -69,7 +72,7 @@ class Bid(SoftDeleteModel):
         on_delete=models.CASCADE,
         help_text="Bidding user."
     )
-    item = models.ForeignKey(
+    lot = models.ForeignKey(
         Lot,
         related_name="bids",
         on_delete=models.CASCADE
@@ -84,10 +87,11 @@ class Bid(SoftDeleteModel):
         )
     )
     submitted_at = models.DateTimeField(default=timezone.now)
-    # Store if this is the highest bid for the item.
+    # Store if this is the highest bid for the lot.
+    #
     # Defined here to prevent circular dependencies and keep consistency
     # with the other foreign keys defined.
-    winning_item = models.OneToOneField(
+    highest_for_lot = models.OneToOneField(
         Lot,
         null=True,
         related_name="highest_bid",
@@ -98,7 +102,7 @@ class Bid(SoftDeleteModel):
         # Index the database table first by user, then by most recent
         # submission time, which means the bid is higher.
         indexes = [
-            models.Index(fields=['item', '-submitted_at'])
+            models.Index(fields=['lot', '-submitted_at'])
         ]
 
 
@@ -106,7 +110,7 @@ class Sale(models.Model):
     """
     Record a sale once an auction is closed and the respective winning bid.
     """
-    item = models.OneToOneField(
+    lot = models.OneToOneField(
         Lot,
         related_name="sale_record",
         on_delete=models.CASCADE,
@@ -120,7 +124,7 @@ class Sale(models.Model):
     )
     closed_at = models.DateTimeField(
         default=timezone.now,
-        help_text="Date and time (aware) of when the sale was done.",
+        help_text="Date and time (in UTC) of when the sale was done.",
         # Index the table by time of sale closure.
         db_index=True
     )

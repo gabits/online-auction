@@ -9,16 +9,16 @@ app_name = 'v1'
 
 urlpatterns = [
     re_path(
-        '$', views.LotListAPIView.as_view(),
+        '^$', views.LotListAPIView.as_view(),
         name='list_create'
     ),
     re_path(
-        f'(?P<public_id>{settings.UUID_REGEX_FORMAT})$',
+        f'^(?P<public_id>{settings.UUID_REGEX_FORMAT})$',
         views.LotRetrieveUpdateDestroyAPIView.as_view(),
         name='retrieve_update_destroy'
     ),
     re_path(
-        f'(?P<public_id>{settings.UUID_REGEX_FORMAT})/bids$',
+        f'^(?P<public_id>{settings.UUID_REGEX_FORMAT})/bids$',
         views.BidListAPIView.as_view(),
         name='bid_collection'
     ),

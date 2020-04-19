@@ -27,7 +27,7 @@ class LotFactory(DjangoModelFactory):
 
 
 class BidFactory(DjangoModelFactory):
-    item = LotFactory()
+    lot = LotFactory()
     price = LazyAttribute(
         lambda obj: str(
             fake.pydecimal(right_digits=2, min_value=0.00, max_value=1000.00)

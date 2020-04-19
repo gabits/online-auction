@@ -30,7 +30,7 @@ database servers or message brokers.
  # To run on a different port
  ./auction/manage.py runserver [port_number]
  # e.g. the following example runs on port 80
- ./auction/manage.py runserver 80
+ ./app/manage.py runserver 80
 ```
 
 --------
@@ -39,13 +39,14 @@ database servers or message brokers.
 Tests can be ran using Django's usual test command.
 ```bash
  # Run all test suite for an app
- ./auction/manage.py test [app_name]
+ ./app/manage.py test [app_name]
 # e.g.
- ./auction/manage.py test auction
+ ./app/manage.py test auction
 
  # Run individual tests
- ./auction/manage.py test path.to.module
+ ./app/manage.py test path.to.module
 
  # For example:
- ./auction/manage.py test auction.api.v1.tests.test_views.TestMockView
+ ./app/manage.py test auction.api.v1.tests.test_views.TestMockView
 ```
+````

@@ -21,9 +21,9 @@ from auction.models import Lot
 
 class LotListAPIView(ListCreateAPIView):
     """
-    GET requests to this endpoint will return a list of all existing auction
-    items. Its results can be queried by fields such as active or
-    inactive items, which can also be ordered.
+    GET requests to this endpoint will return a list of all existing lots.
+    Results can be queried by fields such as active or inactive lots,
+    which can also be ordered.
 
     POST requests to this endpoint will create a single lot (auction item) in
     the system, which are by default inactive - not for auction - unless
@@ -43,11 +43,11 @@ class LotListAPIView(ListCreateAPIView):
 
 class LotRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     """
-    GET requests to this endpoint will retrieve an auction item, if the URL
-    matches the public_id of an existing one in the system.
+    GET requests to this endpoint will retrieve a lot, if the URL matches the
+    public_id of an existing one in the system.
 
-    DELETE requests to this endpoint will attempt to delete the auction item
-    from the system.
+    DELETE requests to this endpoint will attempt to delete the lot from the
+    system.
     """
     queryset = Lot.objects.all()
     lookup_field = 'public_id'

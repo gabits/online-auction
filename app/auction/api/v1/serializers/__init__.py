@@ -1,2 +1,2 @@
-from .lot import *
 from .bid import *
+from .lot import *
