@@ -64,11 +64,12 @@ database servers or message brokers.
 **Note: Skip this step if you have used the automated set up method.**
 
 #### Load fixtures
-To test locally, load seed data to provide testing fixtures. Note that this 
-command should be ran on an empty database, otherwise you may get integrity
+To test locally, load seed data to provide testing fixtures. Note that these 
+commands should be ran on an empty database, otherwise you may get integrity
 errors from data conflicts due to unique fields constraints.
 ```bash
  ./app/manage.py loaddata account_seed_data.json
+ ./app/manage.py loaddata auction_seed_data.json
 ```
 
 #### Log in

@@ -1,0 +1,74 @@
+[
+  {
+    "model": "auction.lot",
+    "pk": 15,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "9df68750-761b-4810-9252-25534ee4dd35",
+      "user": 3,
+      "name": "Wooden dolls house (includes 2 dolls)",
+      "condition": "NEW_UNOPENED",
+      "description": "Brand new wooden dolls house which I bought as a gift but never delivered it. Still in the package box.",
+      "base_price_currency": "GBP",
+      "base_price": "74.00",
+      "created_at": "2020-04-19T19:47:32.804Z",
+      "modified_at": null,
+      "is_active": false,
+      "expiration_time": "2020-11-09T04:00:00Z"
+    }
+  },
+  {
+    "model": "auction.lot",
+    "pk": 16,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "bdc636f6-b83c-4d75-8eec-6987dfb0a429",
+      "user": 3,
+      "name": "Classic brown piano",
+      "condition": "DEFECTIVE",
+      "description": "An amazing medium-sized piano from 1927, keys slightly damaged and missing a pedal.",
+      "base_price_currency": "GBP",
+      "base_price": "786.97",
+      "created_at": "2020-04-19T19:48:45.658Z",
+      "modified_at": null,
+      "is_active": true,
+      "expiration_time": "2020-06-05T15:30:00Z"
+    }
+  },
+  {
+    "model": "auction.lot",
+    "pk": 17,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "7111dafa-d674-4870-b23d-8a2d6216be86",
+      "user": 4,
+      "name": "Grandma's Music Box",
+      "condition": "USED",
+      "description": "Beautiful antique that belonged to my granny.",
+      "base_price_currency": "GBP",
+      "base_price": "45.23",
+      "created_at": "2020-04-19T19:49:48.008Z",
+      "modified_at": null,
+      "is_active": true,
+      "expiration_time": "2020-04-30T12:00:00Z"
+    }
+  },
+  {
+    "model": "auction.lot",
+    "pk": 18,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "b2cbbc73-d6bb-43cd-91df-c15d7914be24",
+      "user": 4,
+      "name": "Vintage armchair (UNIQUE design)",
+      "condition": "NEW_UNUSED",
+      "description": "Armchair in antique ebony and solid oak. Perfect state, recently refurbished and never used.",
+      "base_price_currency": "GBP",
+      "base_price": "220.98",
+      "created_at": "2020-04-19T19:52:49.486Z",
+      "modified_at": null,
+      "is_active": false,
+      "expiration_time": "2020-05-31T19:00:00Z"
+    }
+  }
+]

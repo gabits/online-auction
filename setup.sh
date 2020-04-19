@@ -40,6 +40,7 @@ migrate_database() {
 load_initial_data() {
   echo "Loading initial application data."
   ./app/manage.py loaddata account_seed_data.json
+  ./app/manage.py loaddata auction_seed_data.json
   echo "Finished loading seed data."
 }
 

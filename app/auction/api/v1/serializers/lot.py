@@ -13,7 +13,9 @@ class LotListSerializer(serializers.ModelSerializer):
     user = serializers.HyperlinkedRelatedField(
         many=False,
         read_only=True,
-        view_name="account"
+        view_name="api:account:v1:user_detail",
+        lookup_field="public_id",
+        lookup_url_kwarg="public_id"
     )
 
     class Meta:
