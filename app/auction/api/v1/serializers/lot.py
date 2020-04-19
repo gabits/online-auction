@@ -36,6 +36,7 @@ class LotDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "user",
             "highest_bid",
+            # TODO: remove this
             "bids",
             "sale_record",
             "modified_at",

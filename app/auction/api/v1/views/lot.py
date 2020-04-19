@@ -55,10 +55,19 @@ class LotRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = LotDetailSerializer
 
     def perform_update(self, serializer):
+        """
+        If the instance has valid modifications to be performed, save them and
+        record that it has been modified.
+        """
         if serializer.validated_data:
             serializer.save(modified_at=timezone.now())
 
     def perform_destroy(self, instance):
+        """
+        Soft delete the lot record if it is inactive. Otherwise, if it is
+        active, prompt the user to first deactivate it (remove from auction)
+        before deleting.
+        """
         if not instance.is_active:
             super().perform_destroy(instance)
         else:
