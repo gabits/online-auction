@@ -26,6 +26,8 @@ create_virtual_environment () {
 
 
 install_dependencies () {
+  # Deactivate any currently active virtual environment
+  deactivate
   source "$(command -v virtualenvwrapper_lazy.sh)"
   export PATH=$PATH:/usr/local/bin
   create_virtual_environment
@@ -59,3 +61,5 @@ run_tests() {
 install_dependencies
 setup_test_database
 run_tests
+# Deactivate virtual environment
+deactivate
