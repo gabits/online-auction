@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 
 # Third-party
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_condition import Or, Not
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -10,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 # Local
 from auction.api.v1.serializers import BidListSerializer
 from auction.models import Bid, Lot
+from auction.permissions import IsLotObjectOwner, IsReadyOnlyRequest
 
 
 class BidListAPIView(ListCreateAPIView):
@@ -21,7 +23,10 @@ class BidListAPIView(ListCreateAPIView):
     POST requests to this endpoint will submit a bid for this lot, which must
     provide a higher price than the current highest bid.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (
+        IsAuthenticated,
+        Or(IsReadyOnlyRequest, Not(IsLotObjectOwner))
+    )
     serializer_class = BidListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     filterset_fields = []

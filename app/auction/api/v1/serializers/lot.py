@@ -23,7 +23,8 @@ class LotListSerializer(serializers.ModelSerializer):
             "description",
             "base_price",
             "base_price_currency",
-            "is_active"
+            "is_active",
+            "condition"
         )
 
 
@@ -47,4 +48,5 @@ class LotDetailSerializer(serializers.ModelSerializer):
             "is_active",
             "name",
             "description",
+            "condition"
         )

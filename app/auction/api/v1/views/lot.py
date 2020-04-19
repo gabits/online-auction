@@ -4,12 +4,11 @@ from django.utils import timezone
 # Third-party
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 
 # Local
 from auction.api.v1.serializers import (
@@ -30,7 +29,7 @@ class LotListAPIView(ListCreateAPIView):
     explicitly requested otherwise.
     """
     queryset = Lot.objects.all()
-    permission_classes = (IsAuthenticated, )
+    # TODO: permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = LotListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     filterset_fields = ('is_active', 'user__public_id', 'name')
@@ -51,7 +50,6 @@ class LotRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     """
     queryset = Lot.objects.all()
     lookup_field = 'public_id'
-    permission_classes = (IsAuthenticated, )
     serializer_class = LotDetailSerializer
 
     def perform_update(self, serializer):

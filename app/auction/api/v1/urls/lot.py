@@ -17,9 +17,10 @@ urlpatterns = [
         views.LotRetrieveUpdateDestroyAPIView.as_view(),
         name='retrieve_update_destroy'
     ),
+    # Collection endpoint for lot bids
     re_path(
         f'^(?P<public_id>{settings.UUID_REGEX_FORMAT})/bids$',
         views.BidListAPIView.as_view(),
-        name='bid_collection'
+        name='bid'
     ),
 ]

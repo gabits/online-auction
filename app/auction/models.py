@@ -18,6 +18,16 @@ class Lot(SoftDeleteModel):
     """
     Store an individual item placed for auction by a user.
     """
+    NEW_UNOPENED = "NEW_UNOPENED"
+    NEW_UNUSED = "NEW_UNUSED"
+    USED = "USED"
+    DEFECTIVE = "DEFECTIVE"
+    CONDITION_CHOICES = (
+        (NEW_UNOPENED, "New - unopened"),
+        (NEW_UNUSED, "New - opened but unused"),
+        (USED, "Used"),
+        (DEFECTIVE, "Requires service or repair")
+    )
     public_id = models.UUIDField(
         unique=True,
         editable=False,
@@ -33,6 +43,7 @@ class Lot(SoftDeleteModel):
         db_index=True
     )
     name = models.CharField(max_length=255)
+    condition = models.CharField(choices=CONDITION_CHOICES, max_length=255)
     description = models.TextField(
         null=True,
         help_text="Description of the item for auction."
@@ -47,6 +58,7 @@ class Lot(SoftDeleteModel):
     created_at = models.DateTimeField(default=timezone.now)
     modified_at = models.DateTimeField(null=True)
     is_active = models.BooleanField(default=False)
+    expiration_time = models.DateTimeField()
 
     class Meta:
         # Index the database table first by user, then by
