@@ -21,6 +21,6 @@ urlpatterns = [
     re_path(
         f'^(?P<public_id>{settings.UUID_REGEX_FORMAT})/bids$',
         views.BidListAPIView.as_view(),
-        name='bid'
+        name='bidding_history'
     ),
 ]

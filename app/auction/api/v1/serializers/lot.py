@@ -6,16 +6,18 @@ from auction.models import Lot
 
 
 # Serializers used are all hyperlinked to follow REST API guidelines.
-#
-# TODO: Change this ModelSerializer to a HyperlinkedModelSerializer after
-#  /bids/ and /user/ endpoints are implemented so we can hyperlink them
-class LotListSerializer(serializers.ModelSerializer):
+class BaseLotSerializer(serializers.ModelSerializer):
     user = serializers.HyperlinkedRelatedField(
         many=False,
         read_only=True,
         view_name="api:account:v1:user_detail",
         lookup_field="public_id",
         lookup_url_kwarg="public_id"
+    )
+    bids = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name="api:auction:v1:lot:bidding_history"
     )
 
     class Meta:
@@ -24,37 +26,39 @@ class LotListSerializer(serializers.ModelSerializer):
             "public_id",
             "created_at",
             "user",
+            "is_active",
         )
-        fields = read_only_fields + (
+        fields = (
             "name",
-            "description",
             "base_price",
             "base_price_currency",
-            "is_active",
             "condition",
-            "expiration_time"
         )
 
 
-class LotDetailSerializer(serializers.ModelSerializer):
+class LotListSerializer(BaseLotSerializer):
+    detail_url = serializers.HyperlinkedIdentityField(
+        view_name="api:auction:v1:lots:retrieve_update_destroy",
+        lookup_field="public_id"
+    )
 
     class Meta:
-        model = Lot
-        read_only_fields = (
-            "public_id",
-            "created_at",
-            "user",
-            "highest_bid",
-            # TODO: remove this
+        model = BaseLotSerializer.Meta.model
+        read_only_fields = BaseLotSerializer.Meta.read_only_fields + (
+            'detail_url',
+        )
+        fields = read_only_fields + BaseLotSerializer.Meta.fields
+
+
+class LotDetailSerializer(BaseLotSerializer):
+
+    class Meta:
+        model = BaseLotSerializer.Meta.model
+        read_only_fields = BaseLotSerializer.Meta.read_only_fields + (
             "bids",
-            "sale_record",
+            "highest_bid",
             "modified_at",
         )
-        fields = read_only_fields + (
-            "base_price",
-            "base_price_currency",
-            "is_active",
-            "name",
+        fields = read_only_fields + BaseLotSerializer.Meta.fields + (
             "description",
-            "condition"
         )
