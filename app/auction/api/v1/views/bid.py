@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 # Third-party
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_condition import C, ConditionalPermission
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -52,6 +53,10 @@ class BidListAPIView(ListCreateAPIView):
         """
         lot_public_id = self.kwargs["lot_public_id"]
         lot = get_object_or_404(Lot, public_id=lot_public_id)
+        if not lot.is_active:
+            raise ValidationError(
+                "Cannot bid on an item whose auction has expired."
+            )
         self.check_object_permissions(self.request, lot)
         return Bid.objects.filter(lot=lot)
 

@@ -57,8 +57,7 @@ class Lot(SoftDeleteModel):
     )
     created_at = models.DateTimeField(default=timezone.now)
     modified_at = models.DateTimeField(null=True)
-    is_active = models.BooleanField(default=False)
-    expiration_time = models.DateTimeField()
+    expires_at = models.DateTimeField()
 
     class Meta:
         # Index the database table first by user, then by
@@ -70,6 +69,10 @@ class Lot(SoftDeleteModel):
     @property
     def highest_bid(self):
         return self.bids.order_by("price").last()
+
+    @property
+    def is_active(self):
+        return timezone.now() < self.expires_at
 
 
 class Bid(SoftDeleteModel):

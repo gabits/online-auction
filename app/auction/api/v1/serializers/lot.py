@@ -11,6 +11,8 @@ from auction.models import Bid, Lot
 
 
 class BaseLotSerializer(BaseRelatedUserSerializer):
+    is_active = serializers.SerializerMethodField()
+
     class Meta:
         model = Lot
         read_only_fields = BaseRelatedUserSerializer.Meta.read_only_fields + (
@@ -26,6 +28,9 @@ class BaseLotSerializer(BaseRelatedUserSerializer):
             "base_price_currency",
             "condition",
         )
+
+    def get_is_active(self, object) -> bool:
+        return object.is_active
 
 
 class LotListSerializer(BaseLotSerializer):

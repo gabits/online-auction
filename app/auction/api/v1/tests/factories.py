@@ -18,14 +18,13 @@ class LotFactory(DjangoModelFactory):
     user = SubFactory(UserProfileFactory)
     name = LazyAttribute(lambda obj: fake.sentence())
     description = LazyAttribute(lambda obj: fake.text())
-    is_active = LazyAttribute(lambda obj: fake.pybool())
     base_price = LazyAttribute(
         lambda obj: str(
             fake.pydecimal(right_digits=2, min_value=0.00, max_value=1000.00)
         )
     )
     condition = fuzzy.FuzzyChoice(Lot.CONDITION_CHOICES)
-    expiration_time = LazyAttribute(
+    expires_at = LazyAttribute(
         lambda obj: timezone.now() + timedelta(seconds=300)
     )
 

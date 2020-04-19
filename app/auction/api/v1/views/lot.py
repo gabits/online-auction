@@ -32,7 +32,7 @@ class LotListAPIView(ListCreateAPIView):
     # TODO: permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = LotListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_fields = ('is_active', 'user__public_id', 'name')
+    filterset_fields = ('user__public_id', 'name')
     search_fields = ('name', 'description', 'base_price')
     ordering_fields = ('name', 'created_at', 'modified_at', 'base_price')
 
