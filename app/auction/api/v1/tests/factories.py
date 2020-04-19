@@ -1,5 +1,8 @@
 # Third-party
-from factory import LazyAttribute, SubFactory
+from datetime import timedelta
+
+from django.utils import timezone
+from factory import LazyAttribute, SubFactory, fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
@@ -20,6 +23,10 @@ class LotFactory(DjangoModelFactory):
         lambda obj: str(
             fake.pydecimal(right_digits=2, min_value=0.00, max_value=1000.00)
         )
+    )
+    condition = fuzzy.FuzzyChoice(Lot.CONDITION_CHOICES)
+    expiration_time = LazyAttribute(
+        lambda obj: timezone.now() + timedelta(seconds=300)
     )
 
     class Meta:
