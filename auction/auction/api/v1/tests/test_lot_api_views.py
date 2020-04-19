@@ -329,27 +329,108 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
                 description="Beautiful antique that belonged to my granny.",
                 is_active=True
             )
-        for n in range(1, 4):
-            setattr(
-                self,
-                f"bid_{n}",
-                AuctionBidFactory(item=self.auction_item)
-            )
         self.url_args = [self.auction_item.public_id]
 
-    def test_authenticated_get_request_to_existing_auction_returns_200(self):
+    @property
+    def partial_update_data(self):
+        return {"is_active": False}
+
+    @property
+    def complete_update_data(self):
+        return {
+            "is_active": False,
+            "base_price": "18.98",
+            "base_price_currency": "EUR",
+            "description": "Updated description.",
+            "name": "Updated name",
+        }
+
+    def test_write_parameters_to_existing_auction_partial_update(self):
         http_auth = self.get_http_authorization(self.auth_user)
-        response = self.make_request("get", HTTP_AUTHORIZATION=http_auth)
+        with freeze_time("2020-04-10 09:11:34"):
+            response = self.make_request(
+                "patch",
+                HTTP_AUTHORIZATION=http_auth,
+                data=self.partial_update_data,
+                content_type="application/json"
+            )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         expected_response = {
             "base_price": "46.00",
             "base_price_currency": "GBP",
-            # TODO: change this; add endpoint to retrieve bids
-            "bids": [
-                self.bid_3.id,
-                self.bid_2.id,
-                self.bid_1.id,
-            ],
+            "bids": [],
+            "created_at": "2019-12-19T04:35:01Z",
+            "description": "Beautiful antique that belonged to my granny.",
+            "highest_bid": None,
+            "is_active": False,
+            "modified_at": "2020-04-10T09:11:34Z",
+            "name": "Grandma's Music Box",
+            "public_id": str(self.auction_item.public_id),
+            "sale_record": None,
+            "user": self.auth_user.user_profile.id
+        }
+        self.assertEquals(response.json(), expected_response)
+
+        # Confirm that the table has added a modified_at record
+        self.auction_item.refresh_from_db()
+        self.assertEqual(
+            self.auction_item.modified_at.strftime("%Y-%m-%d %H:%M:%s"),
+            "2020-04-10 09:11:1586509894"
+        )
+
+    def test_write_parameters_to_existing_auction_complete_update(self):
+        http_auth = self.get_http_authorization(self.auth_user)
+        with freeze_time("2020-04-10 09:11:34"):
+            response = self.make_request(
+                "put",
+                HTTP_AUTHORIZATION=http_auth,
+                data=self.complete_update_data,
+                content_type="application/json"
+            )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        expected_response = {
+            "base_price": "18.98",
+            "base_price_currency": "EUR",
+            "bids": [],
+            "created_at": "2019-12-19T04:35:01Z",
+            "description": "Updated description.",
+            "highest_bid": None,
+            "is_active": False,
+            "modified_at": "2020-04-10T09:11:34Z",
+            "name": "Updated name",
+            "public_id": str(self.auction_item.public_id),
+            "sale_record": None,
+            "user": self.auth_user.user_profile.id
+        }
+        self.assertEquals(response.json(), expected_response)
+
+        # Confirm that the table has added a modified_at record
+        self.auction_item.refresh_from_db()
+        self.assertEqual(
+            self.auction_item.modified_at.strftime("%Y-%m-%d %H:%M:%s"),
+            "2020-04-10 09:11:1586509894"
+        )
+
+    def test_read_only_parameters_to_auction_does_not_do_partial_update(self):
+        read_only_parameters = {
+            "created_at": "2012-01-31T00:00:00Z",
+            "modified_at": "2020-04-10T09:11:34Z",
+            "public_id": "2d9dca7f-e5a4-49ab-bb39-a44f296f0208",
+            "user": 45
+        }
+        http_auth = self.get_http_authorization(self.auth_user)
+        with freeze_time("2020-04-10 09:11:34"):
+            response = self.make_request(
+                "patch",
+                HTTP_AUTHORIZATION=http_auth,
+                data=read_only_parameters,
+                content_type="application/json"
+            )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        expected_response = {
+            "base_price": "46.00",
+            "base_price_currency": "GBP",
+            "bids": [],
             "created_at": "2019-12-19T04:35:01Z",
             "description": "Beautiful antique that belonged to my granny.",
             "highest_bid": None,
@@ -362,7 +443,34 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         }
         self.assertEquals(response.json(), expected_response)
 
-    def test_authenticated_get_request_to_invalid_auction_returns_404(self):
+        # Confirm that the table has added a modified_at record
+        self.auction_item.refresh_from_db()
+        self.assertIsNone(self.auction_item.modified_at)
+
+    def test_read_only_parameters_to_auction_bad_request(self):
+        read_only_parameters = {
+            "created_at": "2012-01-31T00:00:00Z",
+            "modified_at": "2020-04-10T09:11:34Z",
+            "public_id": "2d9dca7f-e5a4-49ab-bb39-a44f296f0208",
+            "user": 45
+        }
+        http_auth = self.get_http_authorization(self.auth_user)
+        with freeze_time("2020-04-10 09:11:34"):
+            response = self.make_request(
+                "put",
+                HTTP_AUTHORIZATION=http_auth,
+                data=read_only_parameters,
+                content_type="application/json"
+            )
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        expected_response = {"name": ["This field is required."]}
+        self.assertEquals(response.json(), expected_response)
+
+        # Confirm that the table has added a modified_at record
+        self.auction_item.refresh_from_db()
+        self.assertIsNone(self.auction_item.modified_at)
+
+    def test_authenticated_patch_request_to_invalid_auction_returns_404(self):
         non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
         # Confirm that the UUID is not in use as any auction item public id
         self.assertFalse(
@@ -370,16 +478,70 @@ class TestLotUpdateAPIEndpoint(BaseAPIEndpointTestCase):
         )
         self.url_args = [non_existing_uuid]
         http_auth = self.get_http_authorization(self.auth_user)
-        response = self.make_request("get", HTTP_AUTHORIZATION=http_auth)
+        response = self.make_request(
+            "patch",
+            HTTP_AUTHORIZATION=http_auth,
+            data=self.partial_update_data,
+            content_type="application/json"
+        )
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(response.json(), {'detail': 'Not found.'})
 
-    def test_authenticated_get_request_to_deleted_auction_returns_404(self):
+        # Confirm that there was no modification in the database
+        self.auction_item.refresh_from_db()
+        self.assertIsNone(self.auction_item.modified_at)
+
+    def test_authenticated_put_request_to_invalid_auction_returns_404(self):
+        non_existing_uuid = "048bee0f-659e-496f-85c4-7683f67b4525"
+        # Confirm that the UUID is not in use as any auction item public id
+        self.assertFalse(
+            AuctionItem.objects.filter(public_id=non_existing_uuid).exists()
+        )
+        self.url_args = [non_existing_uuid]
+        http_auth = self.get_http_authorization(self.auth_user)
+        response = self.make_request(
+            "put",
+            HTTP_AUTHORIZATION=http_auth,
+            data=self.complete_update_data,
+            content_type="application/json"
+        )
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Confirm that there was no modification in the database
+        self.auction_item.refresh_from_db()
+        self.assertIsNone(self.auction_item.modified_at)
+
+    def test_authenticated_patch_request_to_deleted_auction_returns_404(self):
         self.auction_item.delete()
         http_auth = self.get_http_authorization(self.auth_user)
-        response = self.make_request("get", HTTP_AUTHORIZATION=http_auth)
+        response = self.make_request(
+            "patch",
+            HTTP_AUTHORIZATION=http_auth,
+            data=self.partial_update_data,
+            content_type="application/json"
+        )
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(response.json(), {'detail': 'Not found.'})
+
+        # Confirm that there was no modification in the database
+        self.auction_item.refresh_from_db()
+        self.assertIsNone(self.auction_item.modified_at)
+
+    def test_authenticated_put_request_to_deleted_auction_returns_404(self):
+        self.auction_item.delete()
+        http_auth = self.get_http_authorization(self.auth_user)
+        response = self.make_request(
+            "put",
+            HTTP_AUTHORIZATION=http_auth,
+            data=self.complete_update_data,
+            content_type="application/json"
+        )
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEquals(response.json(), {'detail': 'Not found.'})
+
+        # Confirm that there was no modification in the database
+        self.auction_item.refresh_from_db()
+        self.assertIsNone(self.auction_item.modified_at)
 
 
 class TestLotDeleteAPIEndpoint(BaseAPIEndpointTestCase):

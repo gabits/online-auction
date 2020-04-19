@@ -55,7 +55,8 @@ class AuctionItemRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = AuctionItemDetailSerializer
 
     def perform_update(self, serializer):
-        serializer.save(modified_at=timezone.now())
+        if serializer.validated_data:
+            serializer.save(modified_at=timezone.now())
 
     def perform_destroy(self, instance):
         if not instance.is_active:
