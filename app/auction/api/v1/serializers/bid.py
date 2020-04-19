@@ -24,9 +24,6 @@ class BaseBidSerializer(BaseRelatedUserSerializer):
             "lot",
         )
 
-    def get_is_highest(self, obj) -> bool:
-        return bool(obj.highest_for_lot)
-
 
 class BidListCreateSerializer(BaseBidSerializer):
     detail_url = serializers.HyperlinkedIdentityField(

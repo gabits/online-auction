@@ -67,6 +67,10 @@ class Lot(SoftDeleteModel):
             models.Index(fields=['user', '-created_at'])
         ]
 
+    @property
+    def highest_bid(self):
+        return self.bids.order_by("price").last()
+
 
 class Bid(SoftDeleteModel):
     """
@@ -99,16 +103,6 @@ class Bid(SoftDeleteModel):
         )
     )
     submitted_at = models.DateTimeField(default=timezone.now)
-    # Store if this is the highest bid for the lot.
-    #
-    # Defined here to prevent circular dependencies and keep consistency
-    # with the other foreign keys defined.
-    highest_for_lot = models.OneToOneField(
-        Lot,
-        null=True,
-        related_name="highest_bid",
-        on_delete=models.PROTECT
-    )
 
     class Meta:
         # Index the database table first by user, then by most recent

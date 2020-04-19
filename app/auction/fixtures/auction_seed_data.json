@@ -81,8 +81,7 @@
       "lot": 15,
       "price_currency": "GBP",
       "price": "134.00",
-      "submitted_at": "2020-04-19T21:02:47.422Z",
-      "highest_for_lot": null
+      "submitted_at": "2020-04-19T21:02:47.422Z"
     }
   },
   {
@@ -95,8 +94,7 @@
       "lot": 15,
       "price_currency": "GBP",
       "price": "200.00",
-      "submitted_at": "2020-04-19T21:03:13.583Z",
-      "highest_for_lot": null
+      "submitted_at": "2020-04-19T21:03:13.583Z"
     }
   },
   {
@@ -109,8 +107,7 @@
       "lot": 15,
       "price_currency": "GBP",
       "price": "345.76",
-      "submitted_at": "2020-04-19T21:05:44.473Z",
-      "highest_for_lot": null
+      "submitted_at": "2020-04-19T21:05:44.473Z"
     }
   }
 ]
