@@ -16,7 +16,7 @@ from requests import Response
 from rest_framework import status
 
 # Local
-from common.tests.factories import AuthUserFactory
+from account.tests.factories import AuthUserFactory
 
 
 class APITestMethodsGenerator:

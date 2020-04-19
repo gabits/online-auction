@@ -68,7 +68,7 @@ To test locally, load seed data to provide testing fixtures. Note that this
 command should be ran on an empty database, otherwise you may get integrity
 errors from data conflicts due to unique fields constraints.
 ```bash
- ./app/manage.py loaddata seed_data.json
+ ./app/manage.py loaddata account_seed_data.json
 ```
 
 #### Log in

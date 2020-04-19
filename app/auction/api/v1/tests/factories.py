@@ -8,7 +8,7 @@ from faker import Faker
 
 # Local
 from auction.models import Bid, Lot
-from common.tests.factories import UserProfileFactory
+from account.tests.factories import UserProfileFactory
 
 fake = Faker()
 

@@ -6,7 +6,7 @@ from factory import SubFactory, LazyAttribute, LazyAttributeSequence
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from common.models import UserProfile
+from account.models import UserProfile
 
 fake = Faker()
 auth_user_model = get_user_model()

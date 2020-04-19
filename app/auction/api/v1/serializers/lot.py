@@ -10,6 +10,11 @@ from auction.models import Lot
 # TODO: Change this ModelSerializer to a HyperlinkedModelSerializer after
 #  /bids/ and /user/ endpoints are implemented so we can hyperlink them
 class LotListSerializer(serializers.ModelSerializer):
+    user = serializers.HyperlinkedRelatedField(
+        many=False,
+        read_only=True,
+        view_name="account"
+    )
 
     class Meta:
         model = Lot
@@ -24,7 +29,8 @@ class LotListSerializer(serializers.ModelSerializer):
             "base_price",
             "base_price_currency",
             "is_active",
-            "condition"
+            "condition",
+            "expiration_time"
         )
 
 

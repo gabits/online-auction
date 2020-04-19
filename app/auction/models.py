@@ -11,7 +11,7 @@ from djmoney.models.fields import MoneyField
 from softdelete.models import SoftDeleteModel
 
 # Local
-from common.models import UserProfile
+from account.models import UserProfile
 
 
 class Lot(SoftDeleteModel):

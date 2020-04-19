@@ -25,6 +25,7 @@ start_server() {
   echo "Server is running on port: ${PORT_NUMBER}"
 }
 
+
 update_virtual_environment
 migrate_database
 start_server

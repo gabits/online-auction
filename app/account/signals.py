@@ -1,14 +1,13 @@
 # Django
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
-
-# Local
 from django.dispatch import receiver
 
-from common.models import UserProfile
+# Local
+from account.models import UserProfile
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+@receiver(post_save, sender=get_user_model())
 def create_user_profile(
         sender, instance=None, **kwargs
 ):

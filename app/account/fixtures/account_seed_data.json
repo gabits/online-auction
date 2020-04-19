@@ -60,7 +60,7 @@
       "password": "pbkdf2_sha256$180000$vucKh2rj8YmV$36p2/fUgnNFLH09INeDV6BLXy/t2S/QrVYDgG/2FiQs=",
       "last_login": null,
       "is_superuser": false,
-      "username": "Raul",
+      "username": "raul",
       "first_name": "Raul",
       "last_name": "Perez",
       "email": "raul.perez@example.com",

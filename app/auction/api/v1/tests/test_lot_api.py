@@ -4,7 +4,7 @@ from rest_framework import status
 
 from auction.api.v1.tests.factories import BidFactory, LotFactory
 from auction.models import Lot
-from common.tests.factories import UserProfileFactory
+from account.tests.factories import UserProfileFactory
 from common.tests.mixins import (
     APITestMethodsGenerator,
     BaseAPIEndpointTestCase,
