@@ -7,9 +7,6 @@ from auction.models import Bid, Lot
 
 
 class BaseBidSerializer(BaseRelatedUserSerializer):
-    is_highest = serializers.SerializerMethodField(
-        help_text="Whether or not this bid is currently the lot's highest."
-    )
     lot = serializers.SlugRelatedField(
         slug_field="public_id",
         queryset=Lot.objects.all(),
@@ -47,6 +44,5 @@ class BidDetailSerializer(BaseBidSerializer):
         read_only_fields = BaseBidSerializer.Meta.read_only_fields + (
             "public_id",
             "submitted_at",
-            "is_highest",
         )
         fields = read_only_fields + BaseBidSerializer.Meta.fields
