@@ -72,12 +72,14 @@ errors from data conflicts due to unique fields constraints.
 ```
 
 #### Log in
-Once that's done, you should have loaded in your database the default user 
-information for login and API requests:
+Once that's done, you should have loaded in your database default users. 
+Below is the information for admin login:
 ```bash
  username: admin
- password: testtest
- token: 1234
+ password: tH4wUs81
+ # Use the following token in the header like: 
+ # "HTTP_AUTHORIZATION: Bearer <token>"
+ token: Admin
 ```
 To create more user, use the default admin user provided with seed data, 
 go to Django Admin > Authentication and Authorization > Users > Add Users. 
