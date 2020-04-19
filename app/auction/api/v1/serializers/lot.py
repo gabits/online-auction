@@ -14,6 +14,7 @@ class BaseLotSerializer(serializers.ModelSerializer):
         lookup_field="public_id",
         lookup_url_kwarg="public_id"
     )
+    username = serializers.SerializerMethodField()
     bids = serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
@@ -27,6 +28,7 @@ class BaseLotSerializer(serializers.ModelSerializer):
             "created_at",
             "user",
             "is_active",
+            'username',
         )
         fields = (
             "name",
@@ -34,6 +36,9 @@ class BaseLotSerializer(serializers.ModelSerializer):
             "base_price_currency",
             "condition",
         )
+
+    def get_username(self, obj) -> str:
+        return obj.user.auth_user.username
 
 
 class LotListSerializer(BaseLotSerializer):
