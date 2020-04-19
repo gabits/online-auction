@@ -1,11 +1,27 @@
 Online Auction
 =======
 Back-end application which exposes a REST API for an online auction based on
-single user lots (such as eBay).
+single user lots (such as eBay) placed for sale for a determined period of time.
 
 --------
 
-## Set up instructions
+# Set up instructions
+
+_Note: Instructions are available for OS X and Linux only._
+
+## Requirements
+Ensure you have installed locally the following:
+* [Python 3.7.4](https://www.python.org/downloads/release/python-374/)
+* [virtualenv](https://pypi.org/project/virtualenv/)
+* [virtualenvwrapper](https://pypi.org/project/virtualenvwrapper/)
+
+## Automated set up
+Ensure Python 3.7.4 is on your PATH and run:
+```bash
+ ./setup.sh
+``` 
+
+## Manual set up
 Clone the repository from GitHub. Then, install the application dependencies 
 and run the local server.
 
@@ -17,18 +33,24 @@ Preferably, you should do it inside a virtual environment.
  pip install -r requirements.txt
 ```
 
+### Prepare the database
+Migrate the database schema.
+```bash
+ ./app/manage.py migrate
+```
+
 ### Run local server
 Run the local Django server. You can specify any ports where you would prefer 
 to run it on instead of the default (8000). Be wary to not specify the same
 port as the default reserved hosts for other common applications, such as 
 database servers or message brokers.
 ```bash
- python auction/manage.py runserver
+ python app/manage.py runserver
  # or
- ./auction/manage.py runserver
+ ./app/manage.py runserver
 
  # To run on a different port
- ./auction/manage.py runserver [port_number]
+ ./app/manage.py runserver [port_number]
  # e.g. the following example runs on port 80
  ./app/manage.py runserver 80
 ```
@@ -60,6 +82,11 @@ management command to create a superuser:
 
 ### Automated tests
 Automated tests for this platform can be ran using Django's usual test command.
+You must either specify the test settings flag or set an environment variable
+in order to use a dedicated database for testing. 
+
+A dedicated database to run tests  is strongly recommended, because otherwise tests may find conflicts with data or accidentally flush
+an existing database that was pre-populated.
 ```bash
  # Run all test suite for an app
  ./app/manage.py test [app_name]
