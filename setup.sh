@@ -6,6 +6,8 @@ VIRTUALENV_NAME=online-auction
 
 
 create_virtual_environment () {
+  # Deactivate any currently active virtual environment
+  deactivate
   rmvirtualenv $VIRTUALENV_NAME
   mkvirtualenv $VIRTUALENV_NAME --python=$PYTHON_PATH
 }
@@ -40,3 +42,5 @@ load_initial_data() {
 install_dependencies
 migrate_database
 load_initial_data
+# Deactivate virtual environment
+deactivate

@@ -7,6 +7,8 @@ PORT_NUMBER=8000
 
 update_virtual_environment () {
   source "$(command -v virtualenvwrapper_lazy.sh)"
+  # Deactivate any currently active virtual environment
+  deactivate
   workon $VIRTUALENV_NAME
   export PATH=$PATH:${VIRTUAL_ENV}/bin
   pip install --upgrade pip
@@ -26,3 +28,5 @@ start_server() {
 update_virtual_environment
 migrate_database
 start_server
+# Deactivate virtual environment
+deactivate
