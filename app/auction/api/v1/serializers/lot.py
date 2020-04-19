@@ -20,13 +20,13 @@ class BaseLotSerializer(BaseRelatedUserSerializer):
             "created_at",
             "user",
             "is_active",
-            'username',
         )
         fields = (
             "name",
             "base_price",
             "base_price_currency",
             "condition",
+            "expires_at"
         )
 
     def get_is_active(self, object) -> bool:

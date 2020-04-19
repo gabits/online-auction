@@ -32,9 +32,20 @@ class LotListAPIView(ListCreateAPIView):
     # TODO: permission_classes = (IsAuthenticatedOrReadOnly, )
     serializer_class = LotListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_fields = ('user__public_id', 'name')
+    filterset_fields = (
+        'user__public_id',
+        'name',
+        'expires_at',
+        'base_price_currency'
+    )
     search_fields = ('name', 'description', 'base_price')
-    ordering_fields = ('name', 'created_at', 'modified_at', 'base_price')
+    ordering_fields = (
+        'name',
+        'created_at',
+        'modified_at',
+        'base_price',
+        'expires_at'
+    )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user.user_profile)
@@ -61,20 +72,18 @@ class LotRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         if serializer.validated_data:
             serializer.save(modified_at=timezone.now())
 
-    def perform_destroy(self, instance):
-        """
-        Soft delete the lot record if it is inactive. Otherwise, if it is
-        active, prompt the user to first deactivate it (remove from auction)
-        before deleting.
-        """
+    def get_object(self):
+        object = super().get_object()
+        self._validate_inactive_instance(object)
+        return object
+
+    def _validate_inactive_instance(self, instance):
         if not instance.is_active:
-            super().perform_destroy(instance)
-        else:
             raise ValidationError(
                 detail={
                     "detail": (
-                        "Cannot delete a lot which is currently active. "
-                        "Please set it inactive first."
+                        "Cannot update neither delete a lot which is no "
+                        "longer active."
                     )
                 }
             )
