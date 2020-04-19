@@ -7,7 +7,7 @@ class IsReadyOnlyRequest(permissions.BasePermission):
         return request.method in permissions.SAFE_METHODS
 
 
-class IsLotObjectOwner(permissions.BasePermission):
+class IsLotObjectOwner(permissions.DjangoObjectPermissions):
 
     def has_object_permission(self, request, view, obj):
         return obj.lot.user.auth_user == request.user

@@ -5,7 +5,7 @@ from django.urls import re_path
 # Local
 from auction.api.v1 import views
 
-app_name = 'v1'
+app_name = 'lot'
 
 urlpatterns = [
     re_path(
@@ -13,14 +13,14 @@ urlpatterns = [
         name='list_create'
     ),
     re_path(
-        f'^(?P<public_id>{settings.UUID_REGEX_FORMAT})$',
+        f'^(?P<lot_public_id>{settings.UUID_REGEX_FORMAT})$',
         views.LotRetrieveUpdateDestroyAPIView.as_view(),
         name='retrieve_update_destroy'
     ),
     # Collection endpoint for lot bids
     re_path(
-        f'^(?P<public_id>{settings.UUID_REGEX_FORMAT})/bids$',
+        f'^(?P<lot_public_id>{settings.UUID_REGEX_FORMAT})/bids$',
         views.BidListAPIView.as_view(),
         name='bidding_history'
-    ),
+    )
 ]

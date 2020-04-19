@@ -70,5 +70,47 @@
       "is_active": false,
       "expiration_time": "2020-05-31T19:00:00Z"
     }
+  },
+    {
+    "model": "auction.bid",
+    "pk": 1,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "887cde53-fe1c-4372-8b45-e6d938cb71ae",
+      "user": 4,
+      "lot": 15,
+      "price_currency": "GBP",
+      "price": "134.00",
+      "submitted_at": "2020-04-19T21:02:47.422Z",
+      "highest_for_lot": null
+    }
+  },
+  {
+    "model": "auction.bid",
+    "pk": 2,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "d2be73dd-90f1-4739-8613-bac3a0a1a5dd",
+      "user": 2,
+      "lot": 15,
+      "price_currency": "GBP",
+      "price": "200.00",
+      "submitted_at": "2020-04-19T21:03:13.583Z",
+      "highest_for_lot": null
+    }
+  },
+  {
+    "model": "auction.bid",
+    "pk": 3,
+    "fields": {
+      "deleted_at": null,
+      "public_id": "cbdf0d5c-3f46-40af-921c-a41d23303bac",
+      "user": 4,
+      "lot": 15,
+      "price_currency": "GBP",
+      "price": "345.76",
+      "submitted_at": "2020-04-19T21:05:44.473Z",
+      "highest_for_lot": null
+    }
   }
 ]

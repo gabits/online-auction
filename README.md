@@ -40,11 +40,21 @@ Migrate the database schema.
  ./app/manage.py migrate
 ```
 
-### Run local server
-Run the local Django server. You can specify any ports where you would prefer 
-to run it on instead of the default (8000). Be wary to not specify the same
-port as the default reserved hosts for other common applications, such as 
-database servers or message brokers.
+-----
+
+## Run local server
+
+#### Automated
+```bash
+ ./run.sh
+```
+
+#### Manual
+To run the local Django server manually, use the commands specified below. 
+You can specify any ports where you would prefer to run it on instead of the 
+default (8000). Be wary to not specify the same port as the default reserved 
+hosts for other common applications, such as database servers or message 
+brokers.
 ```bash
  python app/manage.py runserver
  # or
@@ -91,6 +101,7 @@ management command to create a superuser:
 ``` 
 
 ### Automated tests
+#### Automated
 Run tests with the following script:
 ```bash
  # Execute all tests
@@ -102,6 +113,7 @@ Run tests with the following script:
  ./test.sh path/to/module.py
 ```
 
+#### Manual
 Automated tests for this platform can also be ran using Django's usual test 
 command. You must either specify the test settings flag or set an environment 
 variable in order to use a dedicated database for testing. 
@@ -123,4 +135,3 @@ that was pre-populated.
  # For example:
  ./app/manage.py test auction.api.v1.tests.test_views.TestMockView
 ```
-`

@@ -49,7 +49,8 @@ class LotRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     system.
     """
     queryset = Lot.objects.all()
-    lookup_field = 'public_id'
+    lookup_field = "public_id"
+    lookup_url_kwarg = "lot_public_id"
     serializer_class = LotDetailSerializer
 
     def perform_update(self, serializer):
