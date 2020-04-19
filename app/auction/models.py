@@ -14,7 +14,31 @@ from softdelete.models import SoftDeleteModel
 from account.models import UserProfile
 
 
-class Lot(SoftDeleteModel):
+class GenericApplicationModel(SoftDeleteModel):
+    """
+    Abstract model to implement common elements for all models, such as a
+    public UUID to expose in the API and soft deletion for audit log and
+    troubleshooting purposes.
+    """
+    public_id = models.UUIDField(
+        unique=True,
+        editable=False,
+        default=uuid.uuid4,
+        help_text="Public identifier to be exposed in the API."
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        abstract = True
+
+
+class Auction(GenericApplicationModel):
+    """
+    Store an auction started by an user.
+    """
+
+
+class Lot(GenericApplicationModel):
     """
     Store an individual item placed for auction by a user.
     """
@@ -27,12 +51,6 @@ class Lot(SoftDeleteModel):
         (NEW_UNUSED, "New - opened but unused"),
         (USED, "Used"),
         (DEFECTIVE, "Requires service or repair")
-    )
-    public_id = models.UUIDField(
-        unique=True,
-        editable=False,
-        default=uuid.uuid4,
-        help_text="Public identifier to be exposed in the API."
     )
     user = models.ForeignKey(
         UserProfile,
@@ -55,7 +73,6 @@ class Lot(SoftDeleteModel):
         default_currency=settings.DEFAULT_CURRENCY,
         help_text="Starting price for the auction.",
     )
-    created_at = models.DateTimeField(default=timezone.now)
     modified_at = models.DateTimeField(null=True)
     expires_at = models.DateTimeField()
 
@@ -75,7 +92,7 @@ class Lot(SoftDeleteModel):
         return timezone.now() < self.expires_at
 
 
-class Bid(SoftDeleteModel):
+class Bid(GenericApplicationModel):
     """
     Record a bid made by a user for a lot.
     """
@@ -105,11 +122,10 @@ class Bid(SoftDeleteModel):
             "Default currency is in Sterling Pounds."
         )
     )
-    submitted_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         # Index the database table first by user, then by most recent
         # submission time, which means the bid is higher.
         indexes = [
-            models.Index(fields=['lot', '-submitted_at'])
+            models.Index(fields=['lot', '-created_at'])
         ]

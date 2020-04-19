@@ -43,6 +43,6 @@ class BidDetailSerializer(BaseBidSerializer):
         model = BaseBidSerializer.Meta.model
         read_only_fields = BaseBidSerializer.Meta.read_only_fields + (
             "public_id",
-            "submitted_at",
+            "created_at",
         )
         fields = read_only_fields + BaseBidSerializer.Meta.fields

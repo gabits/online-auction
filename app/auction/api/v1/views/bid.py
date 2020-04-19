@@ -32,9 +32,9 @@ class BidListAPIView(ListAPIView):
     """
     serializer_class = BidListCreateSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    filterset_fields = ["user__public_id", "submitted_at"]
+    filterset_fields = ["user__public_id", "created_at"]
     search_fields = ["user__username"]
-    ordering_fields = ["user__public_id", "price", "submitted_at"]
+    ordering_fields = ["user__public_id", "price", "created_at"]
 
     def get_queryset(self):
         """
