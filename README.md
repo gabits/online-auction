@@ -5,7 +5,7 @@ single user lots (such as eBay) placed for sale for a determined period of time.
 
 --------
 
-# Set up instructions
+# Local installation
 
 _Note: Instructions are available for OS X and Linux only._
 
@@ -15,18 +15,20 @@ Ensure you have installed locally the following:
 * [virtualenv](https://pypi.org/project/virtualenv/)
 * [virtualenvwrapper](https://pypi.org/project/virtualenvwrapper/)
 
-## Automated set up
+
+## Set up
+
+### Automated
 Ensure Python 3.7.4 is on your PATH and run:
 ```bash
  ./setup.sh
- ./run.sh
 ``` 
 
-## Manual set up
+### Manual
 Clone the repository from GitHub. Then, install the application dependencies 
 and run the local server.
 
-### Installation
+#### App installation
 Install dependencies with a Python package manager such as `pip`. 
 Preferably, you should do it inside a virtual environment.
 ```bash
@@ -34,13 +36,11 @@ Preferably, you should do it inside a virtual environment.
  pip install -r requirements.txt
 ```
 
-### Prepare the database
+#### Database
 Migrate the database schema.
 ```bash
  ./app/manage.py migrate
 ```
-
------
 
 ## Run local server
 
@@ -66,7 +66,6 @@ brokers.
  ./app/manage.py runserver 80
 ```
 
---------
 
 ## Testing
 ### Manual tests
@@ -101,7 +100,7 @@ management command to create a superuser:
 ``` 
 
 ### Automated tests
-#### Automated
+#### Platform specific
 Run tests with the following script:
 ```bash
  # Execute all tests
@@ -113,7 +112,7 @@ Run tests with the following script:
  ./test.sh path/to/module.py
 ```
 
-#### Manual
+#### Using Django
 Automated tests for this platform can also be ran using Django's usual test 
 command. You must either specify the test settings flag or set an environment 
 variable in order to use a dedicated database for testing. 
