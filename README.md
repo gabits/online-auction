@@ -1,7 +1,45 @@
 Online Auction
 =======
-Back-end application which exposes a REST API for an online auction based on
-single user lots (such as eBay) placed for sale for a determined period of time.
+
+Stateful back-end application exposing a REST API which simulates an online 
+auction system. Originally this is based on single user lots (such as eBay) 
+placed for sale for a determined period of time.
+
+Web application built in Python using Django and Django REST Framework, using 
+SQLite databases.
+
+The main goal was to develop a microservice-oriented architecture using a 
+RESTful API, following a combination of Roy Fleming's indications and most 
+recent industry standards. 
+
+This repository will be continuously (although not frequently) developed. As I 
+learn better practices, smarter approaches, or decide to experiment new ideas, 
+I will extend and maintain this application.
+
+The repository includes automated scripts for installing, testing and running
+this app locally, but deployment details are kept with the maintainer. 
+
+--------
+
+# Index
+
+[Local installation](#local-installation)
+
+1. [Requirements](#requirements)
+
+2. [Set up](#set-up)
+
+    a. [Automated](#automated)
+    
+    b. [Manual](#manual)
+
+3. [Run local server](#run-local-server)
+
+4. [Testing](#run-local-server)
+
+    a. [Manual tests (QA)](#manual-tests)
+
+    a. [Automated tests](#automated-tests)
 
 --------
 
